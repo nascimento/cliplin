@@ -20,6 +20,23 @@ app = typer.Typer(
 console = Console()
 
 
+def print_cliplin_banner() -> None:
+    """Display Cliplin ASCII art banner."""
+    banner = """
+    ╔═══════════════════════════════════════════════╗
+    ║                                               ║
+    ║   ██████╗██╗     ██╗██████╗ ██╗     ██╗███╗   ██╗
+    ║  ██╔════╝██║     ██║██╔══██╗██║     ██║████╗  ██║
+    ║  ██║     ██║     ██║██████╔╝██║     ██║██╔██╗ ██║
+    ║  ██║     ██║     ██║██╔═══╝ ██║     ██║██║╚██╗██║
+    ║  ╚██████╗███████╗██║██║     ███████╗██║██║ ╚████║
+    ║   ╚═════╝╚══════╝╚═╝╚═╝     ╚══════╝╚═╝╚═╝  ╚═══╝
+    ║                                               ║
+    ╚═══════════════════════════════════════════════╝
+    """
+    console.print(f"[bold cyan]{banner}[/bold cyan]")
+
+
 def version_callback(value: bool) -> None:
     """Display version information."""
     if value:
@@ -51,6 +68,10 @@ def main(
     ),
 ) -> None:
     """Cliplin CLI - Initialize and manage Cliplin projects."""
+    # Show banner (skip if version flag is set, as it will exit)
+    if not version:
+        print_cliplin_banner()
+    
     # Validate Python version
     if sys.version_info < (3, 10):
         console.print(
