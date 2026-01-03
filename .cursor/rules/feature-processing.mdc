@@ -1,0 +1,188 @@
+---
+alwaysApply: true
+---
+
+## Feature File Processing Rules
+
+### When User Requests Feature Implementation
+
+When a user asks to implement a feature or work with `.feature` files:
+
+1. **Feature Analysis Phase**:
+   - Read and analyze the `.feature` file from the `docs/features/` directory
+   - Identify all scenarios (Given-When-Then steps)
+   - Extract business rules and acceptance criteria
+   - Identify domain entities, use cases, and boundaries
+
+2. **Detailed Implementation Plan Creation**:
+   Create a comprehensive plan that includes:
+   
+   **a) Architecture Analysis**:
+   - Identify which domain layer components are needed (entities, value objects, use cases)
+   - Determine required ports (interfaces) following hexagonal architecture
+   - Identify adapters needed (repositories, external services, etc.)
+   - Map feature scenarios to use cases
+   
+   **b) Business Logic Implementation**:
+   - List all business logic components to implement
+   - Identify validation rules and business constraints
+   - Define domain models and their relationships
+   - Specify error handling requirements
+   
+   **c) Unit Test Strategy**:
+   - For each business logic component, create unit test specifications:
+     * Test each use case independently with mocked dependencies
+     * Test edge cases, validation rules, and error conditions
+     * Use pytest fixtures for test setup
+     * Mock all external dependencies using unittest.mock or pytest-mock
+     * Achieve minimum 80% code coverage for business logic
+   
+   **d) BDD Test Strategy**:
+   - Map each scenario from the `.feature` file to BDD test steps
+   - Implement step definitions that exercise the full feature flow
+   - Ensure BDD tests validate end-to-end feature behavior
+   - BDD tests should use real adapters (not mocks) to validate integration
+   
+   **e) Implementation Checklist**:
+   - [ ] Domain entities and value objects
+   - [ ] Use case implementations
+   - [ ] Unit tests for business logic
+   - [ ] BDD/acceptance tests
+   - [ ] Error handling and validation
+   - [ ] Type hints and documentation
+
+3. **Implementation Execution**:
+   - Follow the plan step by step
+   - Implement domain logic first
+   - Write unit tests alongside business logic implementation (TDD approach)
+   - Write BDD tests that validate the complete feature
+   - Ensure all tests pass before marking feature as complete
+
+4. **Feature Completion**:
+   - Once all implementation is complete and tests pass:
+     * Add `@status:implemented` tag to the feature file at the top level to mark it as implemented and active
+     * Ensure the feature file is properly formatted and readable
+     * All code and tests must be traceable back to the feature scenarios
+   
+   - When modifying an existing implemented feature:
+     * Add `@changed:YYYY-MM-DD` tag with the current date
+     * Add `@reason:<short description>` tag explaining the reason for the change
+     * If the change significantly deviates from the original specification, document it clearly in the feature file
+     * Ensure all tests are updated and pass after the change
+
+   - When deprecating a feature:
+     * Replace `@status:implemented` with `@status:deprecated` tag
+     * Add `@changed:YYYY-MM-DD` tag with the deprecation date
+     * Add `@reason:<short description>` tag explaining why the feature is deprecated
+     * Marked features should not be modified or extended
+
+   - **Context Learning and Documentation** (after successful implementation or modification):
+     After a feature is successfully implemented or modified, analyze the interaction and learnings to propose updates to context files:
+     
+     * Review the implementation process and identify:
+       - User corrections and feedback received during implementation
+       - Technical decisions made that were not previously documented
+       - Patterns, conventions, or best practices discovered or applied
+       - Constraints or limitations encountered that should be documented
+       - Architectural insights or trade-offs that emerged
+       - UI/UX considerations that arose during implementation
+     
+     * Propose updates to context files based on learnings:
+       - **ADRs (docs/adrs/*.md)**: Document architectural decisions, trade-offs, constraints, or irreversible choices made during implementation
+       - **Business documentation (docs/business/*.md)**: Update business rules, domain concepts, or business constraints that were clarified or refined
+       - **TS4 files (docs/ts4/*.ts4)**: Add or update technical specifications, coding conventions, naming rules, validation strategies, or implementation patterns that were discovered or refined
+       - **UI Intent YAML (docs/ui-intent/*.yaml)**: Document UI/UX insights, component patterns, interaction flows, or user experience decisions that emerged
+     
+     * Present proposed context updates to the user for review before applying:
+       - Explain what was learned and why it should be documented
+       - Specify which context file(s) should be updated and why
+       - Provide clear, actionable updates that capture the knowledge gained
+       - Ensure all updates are traceable to the feature implementation experience
+     
+     * This ensures that knowledge gained during feature implementation becomes part of the system's context, making future implementations more accurate and aligned with established patterns
+
+   - Feature states (based on Cliplin framework):
+     * `@status:pending` or no status tag – feature is not yet implemented
+     * `@status:implemented` – feature is implemented, tested, and active
+     * `@status:deprecated` – feature must not be modified (deprecated)
+
+### Feature File Format Standards
+
+- Use Gherkin syntax for `.feature` files
+- Place feature files in `docs/features/` directory
+- Use descriptive feature names matching the file name
+- Include Background section for common setup steps
+- Tag scenarios appropriately (e.g., `@smoke`, `@critical`, `@wip`)
+- Use semantic status tags following Cliplin framework:
+  * `@status:pending` or no tag for unimplemented features
+  * `@status:implemented` when feature is fully implemented and tested
+  * `@status:deprecated` when feature should not be modified
+- Use change tracking tags when modifying features:
+  * `@changed:YYYY-MM-DD` for the change date
+  * `@reason:<short description>` for change justification
+
+### Example Feature File Structure
+
+```gherkin
+@status:implemented
+Feature: User Authentication
+  As a user
+  I want to authenticate with my credentials
+  So that I can access protected resources
+
+  Background:
+    Given the authentication service is available
+
+  Scenario: Successful login with valid credentials
+    Given a user exists with email "user@example.com" and password "secure123"
+    When I login with email "user@example.com" and password "secure123"
+    Then I should be authenticated
+    And I should receive an access token
+
+  Scenario: Failed login with invalid credentials
+    Given a user exists with email "user@example.com" and password "secure123"
+    When I login with email "user@example.com" and password "wrongpassword"
+    Then I should not be authenticated
+    And I should receive an authentication error
+```
+
+### Example Feature File with Change Tracking
+
+```gherkin
+@status:implemented
+@changed:2024-12-20
+@reason:Added MFA support requirement
+Feature: User Authentication
+  As a user
+  I want to authenticate with my credentials and MFA
+  So that I can securely access protected resources
+
+  Background:
+    Given the authentication service is available
+
+  Scenario: Successful login with valid credentials and MFA
+    Given a user exists with email "user@example.com" and password "secure123"
+    And the user has MFA enabled
+    When I login with email "user@example.com" and password "secure123"
+    And I provide valid MFA code "123456"
+    Then I should be authenticated
+    And I should receive an access token
+
+  Scenario: Failed login with invalid MFA code
+    Given a user exists with email "user@example.com" and password "secure123"
+    And the user has MFA enabled
+    When I login with email "user@example.com" and password "secure123"
+    And I provide invalid MFA code "000000"
+    Then I should not be authenticated
+    And I should receive an authentication error
+```
+
+### Testing Requirements
+
+- **Unit Tests**: Test business logic in isolation with mocked dependencies
+  - Focus: Business rules, validation, use case logic
+  - Coverage: Minimum 80% for business logic modules
+  
+- **BDD Tests**: Test complete feature scenarios end-to-end
+  - Focus: Feature scenarios, user workflows, integration
+  - Use real adapters (not mocks) to validate actual behavior
