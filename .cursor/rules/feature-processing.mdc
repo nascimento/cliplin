@@ -25,6 +25,18 @@ When a user asks to implement a feature or work with `.feature` files:
 1. **Feature Analysis Phase**:
    - Read and analyze the `.feature` file from the `docs/features/` directory
    - Identify all scenarios (Given-When-Then steps)
+   - **Analyze scenario status tags**: For each scenario, identify its current status based on tags:
+     * `@status:new` - New scenario that needs implementation
+     * `@status:pending` - Scenario pending implementation
+     * `@status:implemented` - Scenario fully implemented and working
+     * `@status:deprecated` - Scenario deprecated, should not be updated, only maintained
+     * `@status:modified` - Scenario that has been modified and may need re-implementation
+     * `@changed:YYYY-MM-DD` - Date when scenario was last changed
+     * `@reason:<description>` - Reason for status change or modification
+   - **Filter scenarios by status**: Only work on scenarios that are NOT deprecated:
+     * Skip scenarios tagged with `@status:deprecated` during implementation
+     * Focus on scenarios with `@status:new`, `@status:pending`, or `@status:modified`
+     * Maintain deprecated scenarios as-is without modifications
    - Extract business rules and acceptance criteria
    - Identify domain entities, use cases, and boundaries
    - **Use loaded context**: Apply the context loaded from ChromaDB in phase 0 to inform your analysis:
@@ -62,10 +74,11 @@ When a user asks to implement a feature or work with `.feature` files:
    - Achieve minimum 80% code coverage for business logic
    
    **d) BDD Test Strategy**:
-   - Map each scenario from the `.feature` file to BDD test steps
+   - Map each active scenario (non-deprecated) from the `.feature` file to BDD test steps
    - Implement step definitions that exercise the full feature flow
    - Ensure BDD tests validate end-to-end feature behavior
    - BDD tests should use real adapters (not mocks) to validate integration
+   - **Exclude deprecated scenarios**: Do not create or update BDD tests for scenarios tagged with `@status:deprecated`
    
    **e) Implementation Checklist**:
    - [ ] Domain entities and value objects
@@ -77,16 +90,30 @@ When a user asks to implement a feature or work with `.feature` files:
 
 3. **Implementation Execution**:
    - Follow the plan step by step
+   - **Work on active scenarios only**: Implement only scenarios that are NOT deprecated
    - Implement domain logic first
    - Write unit tests alongside business logic implementation (TDD approach)
-   - Write BDD tests that validate the complete feature
-   - Ensure all tests pass before marking feature as complete
+   - Write BDD tests that validate the active scenarios (non-deprecated)
+   - Ensure all tests pass before marking scenarios as complete
 
 4. **Feature Completion**:
-   - Once all implementation is complete and tests pass:
-     * Add `@status:implemented` tag to the feature file at the top level
+   - Once implementation is complete and tests pass for a scenario:
+     * **Add scenario-level tags**: Add tags directly above each scenario (not at feature level):
+       - `@status:implemented` - When a scenario is fully implemented and tested
+       - `@status:new` - When creating a new scenario (remove after implementation)
+       - `@status:modified` - When modifying an existing scenario (remove after re-implementation)
+       - `@changed:YYYY-MM-DD` - Date when scenario was last changed
+       - `@reason:<description>` - Optional reason for status change
+     * **Tag format example**:
+       ```
+       @status:implemented
+       @changed:2024-01-15
+       Scenario: Example scenario name
+         Given ...
+       ```
+     * **Do NOT modify deprecated scenarios**: Leave scenarios with `@status:deprecated` unchanged
      * Ensure the feature file is properly formatted and readable
-     * All code and tests must be traceable back to the feature scenarios
+     * All code and tests must be traceable back to the specific scenarios
      * **Reindex the updated feature file**: Run `cliplin reindex docs/features/feature-name.feature` to update ChromaDB
      * If you created or modified any context files (ADRs, TS4, business docs), reindex them as well
      * This ensures the context remains synchronized with the implementation
@@ -111,18 +138,70 @@ When a user asks to modify an existing feature:
 
 1. **Impact Analysis**:
    - **Use loaded context**: Apply the context already loaded from ChromaDB in phase 0
-   - Identify all features, components, and context files that depend on or relate to the feature being modified
+   - **Identify scenarios to modify**: Analyze which specific scenarios need changes:
+     * Review scenario tags to understand current status
+     * Identify scenarios tagged with `@status:modified` or scenarios that need modification
+     * **Exclude deprecated scenarios**: Do not modify scenarios tagged with `@status:deprecated`
+   - Identify all features, components, and context files that depend on or relate to the scenarios being modified
    - Analyze the scope of changes required based on the loaded context
    - Check for breaking changes that might affect other features using the loaded feature dependencies
    - If additional context is needed, query ChromaDB collections again with more specific queries
 
 2. **Modification Process**:
    - Follow the same phases as feature implementation (Analysis, Planning, Implementation, Completion)
+   - **Work on specific scenarios**: Only modify the scenarios that need changes, not the entire feature
    - Ensure backward compatibility unless explicitly breaking changes are required
    - Update related context files if business rules or technical specs change
-   - Add `@changed:YYYY-MM-DD` and `@reason:<description>` tags to the feature file
+   - **Update scenario tags**: When modifying a scenario:
+     * If modifying an existing implemented scenario, add `@status:modified` tag
+     * Add `@changed:YYYY-MM-DD` tag with the modification date
+     * Add `@reason:<description>` tag explaining why the scenario was modified
+     * After re-implementation, change `@status:modified` to `@status:implemented`
+     * **Example**:
+       ```
+       @status:modified
+       @changed:2024-01-15
+       @reason:Updated to support new authentication flow
+       Scenario: User login
+         Given ...
+       ```
+   - **Deprecate scenarios if needed**: If a scenario should no longer be updated:
+     * Add `@status:deprecated` tag to the scenario
+     * Add `@changed:YYYY-MM-DD` and `@reason:<description>` tags
+     * Keep the scenario in the file for reference but do not modify it further
 
 3. **Post-Modification**:
    - Reindex all modified context files using `cliplin reindex`
    - Verify that related features still work correctly
+   - **Verify scenario status**: Ensure all modified scenarios have appropriate tags:
+     * Implemented scenarios should have `@status:implemented`
+     * Deprecated scenarios should have `@status:deprecated` and should not be modified
+     * Modified scenarios should be updated to `@status:implemented` after completion
    - Update documentation if needed
+
+### Scenario Status Tags Reference
+
+When working with feature files, use the following tags at the **scenario level** (not feature level):
+
+- **`@status:new`** - New scenario that needs implementation. Remove this tag after implementation.
+- **`@status:pending`** - Scenario pending implementation. Default status for new scenarios.
+- **`@status:implemented`** - Scenario fully implemented, tested, and working.
+- **`@status:deprecated`** - Scenario deprecated. Should NOT be updated or modified, only maintained for reference.
+- **`@status:modified`** - Scenario that has been modified and may need re-implementation. Change to `@status:implemented` after completion.
+- **`@changed:YYYY-MM-DD`** - Date when scenario was last changed (format: YYYY-MM-DD).
+- **`@reason:<description>`** - Optional reason for status change or modification.
+
+**Tag placement**: Tags should be placed directly above the `Scenario:` line:
+```
+@status:implemented
+@changed:2024-01-15
+@reason:Updated authentication flow
+Scenario: User login with OAuth
+  Given ...
+```
+
+**Important rules**:
+- Tags are **scenario-specific**, not feature-level
+- **Never modify** scenarios tagged with `@status:deprecated`
+- Always update `@changed` and `@status` tags when modifying scenarios
+- Use `@reason` tag to document why changes were made
