@@ -1,4 +1,3 @@
-@status:pending
 Feature: Tool Command
   As a developer
   I want to open tools from the CLI
@@ -9,6 +8,8 @@ Feature: Tool Command
     And Cliplin has a `tools/` directory in its package directory
     And Cliplin has a `tools/tools.yaml` configuration file that maps tool names to their files
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Open a tool by name
     Given Cliplin has a tool named "ui-intent" configured in its package `tools/tools.yaml`
     And the tool "ui-intent" maps to a file "ui-intent.html" in Cliplin's `tools/` directory
@@ -21,6 +22,8 @@ Feature: Tool Command
     And the webview should load the SPA from Cliplin's tools directory
     And the webview window should display the tool interface
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: List available tools
     Given Cliplin has multiple tools configured in its package `tools/tools.yaml`
     When I run `cliplin tool --list` or `cliplin tool list`
@@ -30,6 +33,8 @@ Feature: Tool Command
     And the CLI should show the tool name and associated file for each tool
     And the CLI should exit successfully
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle tool not found
     Given Cliplin has a `tools/tools.yaml` configuration file in its package
     And the tool "non-existent" is not configured in Cliplin's tools
@@ -41,6 +46,8 @@ Feature: Tool Command
     And the CLI should exit with a non-zero status code
     And no webview should be opened
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle missing tools directory
     Given Cliplin is installed
     And Cliplin's `tools/` directory does not exist in the package
@@ -50,6 +57,8 @@ Feature: Tool Command
     And the CLI should suggest that this is a Cliplin installation issue
     And the CLI should exit with a non-zero status code
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle missing tools configuration file
     Given Cliplin is installed
     And Cliplin's `tools/` directory exists in the package
@@ -60,6 +69,8 @@ Feature: Tool Command
     And the CLI should suggest that this is a Cliplin installation issue
     And the CLI should exit with a non-zero status code
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle missing tool file
     Given Cliplin has a tool named "ui-intent" configured in its package `tools/tools.yaml`
     And the tool "ui-intent" maps to a file "ui-intent.html"
@@ -73,6 +84,8 @@ Feature: Tool Command
     And the CLI should exit with a non-zero status code
     And no webview should be opened
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle invalid tools configuration file
     Given Cliplin is installed
     And Cliplin's `tools/` directory exists in the package
@@ -84,6 +97,8 @@ Feature: Tool Command
     And the CLI should display an error message indicating that the configuration file is invalid
     And the CLI should exit with a non-zero status code
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Open tool with absolute file path
     Given Cliplin has a tool named "custom-tool" configured in its package `tools/tools.yaml`
     And the tool "custom-tool" maps to an absolute file path "/path/to/tool.html"
@@ -95,6 +110,8 @@ Feature: Tool Command
     And the CLI should verify that the file exists
     And the CLI should open a webview with the tool loaded from the absolute path
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Open tool with relative file path
     Given Cliplin has a tool named "ui-intent" configured in its package `tools/tools.yaml`
     And the tool "ui-intent" maps to a relative file path "ui-intent/index.html"
@@ -106,6 +123,8 @@ Feature: Tool Command
     And the CLI should verify that the file exists in Cliplin's tools directory
     And the CLI should open a webview with the tool loaded from the resolved path
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle webview errors gracefully
     Given Cliplin has a tool named "ui-intent" configured in its package `tools/tools.yaml`
     And the tool "ui-intent" maps to a valid file "ui-intent.html" in Cliplin's tools directory
@@ -117,6 +136,8 @@ Feature: Tool Command
     And the CLI should suggest checking webview dependencies
     And the CLI should exit with a non-zero status code
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Tools configuration file structure
     Given Cliplin has a `tools/tools.yaml` configuration file in its package
     Then the configuration file should have a valid YAML structure

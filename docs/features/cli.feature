@@ -1,4 +1,3 @@
-@status:implemented
 Feature: Cliplin CLI Tool
   As a developer
   I want to install and use the Cliplin CLI tool
@@ -8,6 +7,8 @@ Feature: Cliplin CLI Tool
     Given the system has Python 3.10 or higher installed
     And the system has `uv` (Astral UV) installed and available in PATH
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Install CLI tool via uv tool install
     Given I have `uv` installed and available in PATH
     When I run `uv tool install cliplin`
@@ -16,6 +17,8 @@ Feature: Cliplin CLI Tool
     And I should be able to run `cliplin --version` successfully
     And I should be able to run `cliplin --help` successfully
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Initialize a new Cliplin project with default AI tool
     Given I have the Cliplin CLI tool installed
     And I am in an empty directory or a new project directory
@@ -39,6 +42,8 @@ Feature: Cliplin CLI Tool
     And the CLI should validate that the project structure is correct
     And the CLI should display a success message indicating project initialization is complete
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Initialize a Cliplin project with specific AI tool (Cursor)
     Given I have the Cliplin CLI tool installed
     And I am in an empty directory or a new project directory
@@ -56,6 +61,8 @@ Feature: Cliplin CLI Tool
     And the CLI should initialize ChromaDB collections as specified in the context rules
     And the CLI should display a success message indicating project initialization with Cursor is complete
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Initialize a Cliplin project with specific AI tool (Claude Desktop)
     Given I have the Cliplin CLI tool installed
     And I am in an empty directory or a new project directory
@@ -71,6 +78,8 @@ Feature: Cliplin CLI Tool
     And the CLI should initialize ChromaDB collections as specified in the context rules
     And the CLI should display a success message indicating project initialization with Claude Desktop is complete
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Validate project structure after initialization
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     When I run `cliplin validate` or the validation runs automatically after init
@@ -95,6 +104,8 @@ Feature: Cliplin CLI Tool
     And the CLI should verify that required dependencies are available
     And if any validation fails, the CLI should display clear error messages indicating what is missing or incorrect
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Initialize project with ChromaDB MCP server configuration
     Given I have the Cliplin CLI tool installed
     And I am in a directory where I want to initialize a Cliplin project
@@ -117,6 +128,8 @@ Feature: Cliplin CLI Tool
     And the MCP server configuration should be accessible to the AI tool (Cursor)
     And the AI tool should be able to query and update the ChromaDB collections via MCP
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Initialize project with AI rules and conventions
     Given I have the Cliplin CLI tool installed
     And I am in an empty directory or a new project directory
@@ -131,6 +144,8 @@ Feature: Cliplin CLI Tool
     And the rule files should specify feature lifecycle management (pending, implemented, deprecated)
     And the rule files should define impact analysis requirements for feature changes
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle initialization in non-empty directory
     Given I have the Cliplin CLI tool installed
     And I am in a directory that already contains some files
@@ -145,6 +160,8 @@ Feature: Cliplin CLI Tool
     And if the user declines, the CLI should abort without making changes
     And if Cliplin is not initialized, the CLI should proceed with initialization normally
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Create configuration files during initialization
     Given I have the Cliplin CLI tool installed
     And I am in an empty directory or a new project directory
@@ -154,6 +171,8 @@ Feature: Cliplin CLI Tool
     And the CLI should include the AI tool configuration in the config file
     And the CLI should display success messages for each created file
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle invalid AI tool ID
     Given I have the Cliplin CLI tool installed
     And I am in an empty directory or a new project directory
@@ -163,6 +182,8 @@ Feature: Cliplin CLI Tool
     And the CLI should exit with a non-zero status code
     And no files should be created in the current directory
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Display help information
     Given I have the Cliplin CLI tool installed
     When I run `cliplin --help`
@@ -181,6 +202,8 @@ Feature: Cliplin CLI Tool
       | Command | Description |
       | feature apply <feature_filepath> | Generate an implementation prompt for a feature file |
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Display version information
     Given I have the Cliplin CLI tool installed
     When I run `cliplin --version`
@@ -188,6 +211,8 @@ Feature: Cliplin CLI Tool
     And the CLI should display the Python version being used
     And the CLI should display the uv version if available
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Reindex all context files
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -213,6 +238,8 @@ Feature: Cliplin CLI Tool
       | Files Added | Files Updated | Files Skipped | Errors |
     And the CLI should display success message indicating reindexing is complete
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Reindex specific context file
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -232,6 +259,8 @@ Feature: Cliplin CLI Tool
     And the CLI should include proper metadata with file_path, type, and collection
     And the CLI should display a success message indicating the file was reindexed
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Reindex all files of a specific type (TS4)
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -242,6 +271,8 @@ Feature: Cliplin CLI Tool
     And the CLI should process each file with proper metadata
     And the CLI should display a summary showing how many TS4 files were reindexed
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Reindex all files of a specific type (features)
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -252,6 +283,8 @@ Feature: Cliplin CLI Tool
     And the CLI should process each file with proper metadata
     And the CLI should display a summary showing how many feature files were reindexed
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Reindex all files in a specific directory
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -269,6 +302,8 @@ Feature: Cliplin CLI Tool
     And the CLI should process each file with proper metadata
     And the CLI should display a summary showing how many files were reindexed
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Review changes in context files without reindexing
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -285,6 +320,8 @@ Feature: Cliplin CLI Tool
     And the CLI should not make any changes to ChromaDB
     And the CLI should display a summary of what would be reindexed
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle reindexing when ChromaDB is not initialized
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database does not exist at `.cliplin/data/context/chroma.sqlite3`
@@ -294,6 +331,8 @@ Feature: Cliplin CLI Tool
     And the CLI should suggest running `cliplin init` to initialize the project
     And the CLI should exit with a non-zero status code
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle reindexing when file does not exist
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -303,6 +342,8 @@ Feature: Cliplin CLI Tool
     And the CLI should exit with a non-zero status code
     And no changes should be made to ChromaDB
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle reindexing file outside context directories
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -318,6 +359,8 @@ Feature: Cliplin CLI Tool
       | docs/ui-intent |
     And the CLI should exit with a non-zero status code
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Reindex with verbose output
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -329,6 +372,8 @@ Feature: Cliplin CLI Tool
     And the CLI should display any warnings or errors encountered during processing
     And the CLI should provide progress indicators for large batches of files
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Reindex with confirmation prompt
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -341,6 +386,8 @@ Feature: Cliplin CLI Tool
     And if the user declines (n/no), the CLI should abort without making changes
     And the CLI should display a message indicating the action taken
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Reindex and handle duplicate documents
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -352,6 +399,8 @@ Feature: Cliplin CLI Tool
     And the CLI should update the document content, metadata, and embeddings
     And the CLI should display a message indicating the file was updated
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Reindex with collection validation
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -366,6 +415,8 @@ Feature: Cliplin CLI Tool
     And the CLI should use the correct collection for each file type
     And the CLI should display an error if it cannot access or create a collection
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Generate implementation prompt for a feature file
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -376,6 +427,8 @@ Feature: Cliplin CLI Tool
     And the CLI should output the prompt to stdout
     And the CLI should exit with a zero status code
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle feature apply when feature file does not exist
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
@@ -385,6 +438,8 @@ Feature: Cliplin CLI Tool
     And the CLI should exit with a non-zero status code
     And no prompt should be generated
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle feature apply when ChromaDB is not initialized
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database does not exist at `.cliplin/data/context/chroma.sqlite3`
@@ -396,6 +451,8 @@ Feature: Cliplin CLI Tool
     And the CLI should exit with a non-zero status code
     And no prompt should be generated
 
+  @status:implemented
+  @changed:2024-01-15
   Scenario: Handle feature apply when feature file is outside features directory
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
