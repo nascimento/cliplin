@@ -47,13 +47,21 @@ def get_chromadb_client(project_root: Path) -> chromadb.Client:
     db_path = get_chromadb_path(project_root)
     db_path.parent.mkdir(parents=True, exist_ok=True)
     
-    return chromadb.PersistentClient(
-        path=str(db_path.parent),
-        settings=Settings(
-            anonymized_telemetry=False,
-            allow_reset=True,
-        ),
-    )
+    # Convert to absolute path and resolve for Windows compatibility
+    absolute_path = db_path.parent.resolve()
+    
+    try:
+        return chromadb.PersistentClient(
+            path=str(absolute_path),
+            settings=Settings(
+                anonymized_telemetry=False,
+                allow_reset=True,
+            ),
+        )
+    except Exception as e:
+        console.print(f"[red]Error creating ChromaDB client: {e}[/red]")
+        console.print(f"[yellow]Path: {absolute_path}[/yellow]")
+        raise
 
 
 def initialize_collections(client: chromadb.Client) -> None:

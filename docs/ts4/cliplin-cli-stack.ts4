@@ -57,10 +57,18 @@ rules:
   - |
     ChromaDB integration patterns:
     - Use `chromadb.PersistentClient` with path to `.cliplin/data/context/`
+    - ALWAYS resolve paths to absolute using `.resolve()` before passing to ChromaDB (critical for Windows)
     - Initialize collections using `get_or_create_collection()` to avoid errors
     - Use file path (relative to project root) as document ID
     - Include metadata: file_path, type, collection for all indexed documents
     - Check for existing documents before adding to avoid duplicates
+    - Wrap client initialization in try-except with path logging for debugging
+  - |
+    File operations and encoding (CRITICAL for cross-platform compatibility):
+    - ALWAYS specify `encoding="utf-8"` in ALL file write/read operations
+    - This applies to: `write_text()`, `read_text()`, and any file I/O
+    - Default encoding varies by platform (Windows uses cp1252, Linux/macOS use UTF-8)
+    - See `docs/ts4/windows-compatibility-file-operations.ts4` for detailed rules
   - |
     Development and testing:
     - Use `uv pip install -e .` for development mode installation
@@ -81,4 +89,5 @@ code_refs:
   - "src/cliplin/commands/"
   - "src/cliplin/utils/"
   - "docs/adrs/001-cli-implementation-patterns.md"
+  - "docs/ts4/windows-compatibility-file-operations.ts4"
 
