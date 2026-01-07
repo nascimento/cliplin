@@ -549,7 +549,7 @@ def get_cursor_context_content() -> str:
 alwaysApply: true
 ---
 
-## MANDATORY: Load Context Before Any Task
+## MANDATORY: Load Context Before any interaction with the user
 
 **CRITICAL RULE**: Before starting ANY planning, coding, or thinking task, you MUST:
 
@@ -699,10 +699,10 @@ When a user asks to implement a feature or work with `.feature` files:
    **c) Unit Test Strategy**:
    - For each business logic component, create unit test specifications
    - Test each use case independently with mocked dependencies
+   - Use test fixtures and setup utilities as appropriate for the language/framework
+   - Mock all external dependencies to isolate unit tests
    - Test edge cases, validation rules, and error conditions
-   - Use pytest fixtures for test setup
-   - Mock all external dependencies using unittest.mock or pytest-mock
-   - Achieve minimum 80% code coverage for business logic
+   - Aim for minimum 80% code coverage for business logicif is not another coverage rule present on ts4 documents
    
    **d) BDD Test Strategy**:
    - Map each active scenario (non-deprecated) from the `.feature` file to BDD test steps
@@ -717,13 +717,13 @@ When a user asks to implement a feature or work with `.feature` files:
    - [ ] Unit tests for business logic
    - [ ] BDD/acceptance tests
    - [ ] Error handling and validation
-   - [ ] Type hints and documentation
+   - [ ] Type definitions/annotations and documentation
 
 3. **Implementation Execution**:
    - Follow the plan step by step
    - **Work on active scenarios only**: Implement only scenarios that are NOT deprecated
    - Implement domain logic first
-   - Write unit tests alongside business logic implementation (TDD approach)
+   - Write unit tests alongside business logic implementation following Test-Driven Development (TDD) principles
    - Write BDD tests that validate the active scenarios (non-deprecated)
    - Ensure all tests pass before marking scenarios as complete
 
