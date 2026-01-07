@@ -652,6 +652,7 @@ When a user asks to implement a feature or work with `.feature` files:
      * Run `cliplin reindex --dry-run` to check if context files are up to date
      * If context files are outdated, ask user for confirmation before reindexing
      * Only proceed with feature work after ensuring context is current and loaded
+   - **Generate implementation prompt**: Ask the user if they want you to run `cliplin feature apply <feature-filepath>` to generate a structured implementation prompt that includes the feature content and implementation instructions. If the user confirms, execute the command and use the generated prompt as part of your implementation workflow
 
 1. **Feature Analysis Phase**:
    - Read and analyze the `.feature` file from the `docs/features/` directory
@@ -766,6 +767,7 @@ When a user asks to modify an existing feature:
      * Run `cliplin reindex --dry-run` to check if context files are up to date
      * If context files are outdated, ask user for confirmation before reindexing
      * Only proceed with feature modification after ensuring context is current and loaded
+   - **Generate implementation prompt**: Ask the user if they want you to run `cliplin feature apply <feature-filepath>` to generate a structured implementation prompt that includes the feature content and implementation instructions. If the user confirms, execute the command and use the generated prompt as part of your modification workflow
 
 1. **Impact Analysis**:
    - **Use loaded context**: Apply the context already loaded from ChromaDB in phase 0
