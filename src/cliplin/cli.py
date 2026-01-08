@@ -12,6 +12,7 @@ from cliplin.commands.validate import validate_command
 from cliplin.commands.reindex import reindex_command
 from cliplin.commands.feature import feature_apply_command
 from cliplin.commands.tool import tool_command
+from cliplin.commands.adr import adr_generate_command
 
 app = typer.Typer(
     name="cliplin",
@@ -87,12 +88,17 @@ def main(
 feature_app = typer.Typer(name="feature", help="Feature-related commands")
 feature_app.command(name="apply")(feature_apply_command)
 
+# Create adr subcommand group
+adr_app = typer.Typer(name="adr", help="ADR-related commands")
+adr_app.command(name="generate")(adr_generate_command)
+
 # Register commands
 app.command(name="init")(init_command)
 app.command(name="validate")(validate_command)
 app.command(name="reindex")(reindex_command)
 app.command(name="tool")(tool_command)
 app.add_typer(feature_app)
+app.add_typer(adr_app)
 
 
 def main() -> None:

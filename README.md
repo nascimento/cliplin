@@ -143,7 +143,21 @@ cliplin reindex --dry-run
 
 Cliplin uses **ChromaDB** to semantically index and search all your specifications, enabling AI to access relevant context in real-time.
 
-### 4. Use Tools (SPAs)
+### 4. Generate ADR Prompts
+
+For proprietary libraries and SDKs, generate structured prompts that guide AI to create technical ADRs:
+
+```bash
+# From a local repository
+cliplin adr generate ./vendor/my-proprietary-sdk
+
+# From a remote repository (GitHub, GitLab, etc.)
+cliplin adr generate https://github.com/company/proprietary-sdk
+```
+
+The command generates a structured prompt with step-by-step instructions for AI to analyze the repository and create a consistent, precise ADR following Cliplin framework standards.
+
+### 5. Use Tools (SPAs)
 
 Cliplin includes built-in Single Page Applications (SPAs) that you can open directly from the CLI:
 
@@ -157,7 +171,7 @@ cliplin tool ui-intent
 
 **Note:** Tools are part of the Cliplin package installation, not your project. They are provided by Cliplin and available in any project where Cliplin is installed.
 
-### 5. Work with AI
+### 6. Work with AI
 
 With Cliplin configured, you can tell your AI assistant:
 
@@ -216,6 +230,10 @@ cliplin reindex --dry-run             # Preview
 
 # Generate implementation prompt
 cliplin feature apply docs/features/my-feature.feature
+
+# Generate ADR prompt from repository
+cliplin adr generate ./vendor/my-proprietary-sdk        # Local repository
+cliplin adr generate https://github.com/company/sdk     # Remote repository
 
 # Open tools (SPAs)
 cliplin tool ui-intent          # Open a specific tool
