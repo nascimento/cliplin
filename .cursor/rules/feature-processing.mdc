@@ -9,14 +9,14 @@ alwaysApply: true
 When a user asks to implement a feature or work with `.feature` files:
 
 0. **Context Loading Phase (MANDATORY FIRST STEP)**:
-   - **CRITICAL**: Before starting ANY feature analysis or implementation, you MUST load context from the ChromaDB MCP server 'cliplin-context'
-   - **Use MCP tools to query collections**: Use the ChromaDB MCP tools (chroma_query_documents) to load relevant context from ALL collections:
+   - **CRITICAL**: Before starting ANY feature analysis or implementation, you MUST load context from the Cliplin MCP server 'cliplin-context'
+   - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. chroma_query_documents) to load relevant context from ALL collections:
      * Query `business-and-architecture` collection to load ADRs and business documentation
      * Query `tech-specs` collection to load technical specifications and implementation rules
      * Query `features` collection to load related or dependent features
      * Query `uisi` collection to load UI/UX requirements if applicable
    - **Query strategy**: Use semantic queries based on the feature domain, entities, and use cases to retrieve relevant context
-   - **Never proceed without loading context**: Do NOT start feature analysis or implementation until you have queried and loaded the relevant context from ChromaDB
+   - **Never proceed without loading context**: Do NOT start feature analysis or implementation until you have queried and loaded the relevant context from the context store (via Cliplin MCP)
    - **Context update check**: After loading context, verify if any context files need reindexing:
      * Run `cliplin reindex --dry-run` to check if context files are up to date
      * If context files are outdated, ask user for confirmation before reindexing
@@ -40,7 +40,7 @@ When a user asks to implement a feature or work with `.feature` files:
      * Maintain deprecated scenarios as-is without modifications
    - Extract business rules and acceptance criteria
    - Identify domain entities, use cases, and boundaries
-   - **Use loaded context**: Apply the context loaded from ChromaDB in phase 0 to inform your analysis:
+   - **Use loaded context**: Apply the context loaded from the context store (via Cliplin MCP) in phase 0 to inform your analysis:
      * Use business rules from `business-and-architecture` collection
      * Apply technical constraints from `tech-specs` collection
      * Consider dependencies from related features in `features` collection
@@ -50,7 +50,7 @@ When a user asks to implement a feature or work with `.feature` files:
    Create a comprehensive plan that includes:
    
    **a) Architecture Analysis**:
-   - **Use loaded context**: Apply the context already loaded from ChromaDB in phase 0
+   - **Use loaded context**: Apply the context already loaded from the context store (via Cliplin MCP) in phase 0
    - Use ADRs from `business-and-architecture` collection to understand existing architecture decisions
    - Apply technical constraints and patterns from `tech-specs` collection
    - Identify which domain layer components are needed (entities, value objects, use cases)
@@ -58,7 +58,7 @@ When a user asks to implement a feature or work with `.feature` files:
    - Identify adapters needed (repositories, external services, etc.)
    - Map feature scenarios to use cases
    - Ensure consistency with existing patterns documented in the loaded context
-   - If additional context is needed, query ChromaDB collections again with more specific queries
+   - If additional context is needed, query the context store collections again (via Cliplin MCP) with more specific queries
    
    **b) Business Logic Implementation**:
    - List all business logic components to implement
@@ -115,7 +115,7 @@ When a user asks to implement a feature or work with `.feature` files:
      * **Do NOT modify deprecated scenarios**: Leave scenarios with `@status:deprecated` unchanged
      * Ensure the feature file is properly formatted and readable
      * All code and tests must be traceable back to the specific scenarios
-     * **Reindex the updated feature file**: Run `cliplin reindex docs/features/feature-name.feature` to update ChromaDB
+     * **Reindex the updated feature file**: Run `cliplin reindex docs/features/feature-name.feature` to update the context store
      * If you created or modified any context files (ADRs, TS4, business docs), reindex them as well
      * This ensures the context remains synchronized with the implementation
 
@@ -124,14 +124,14 @@ When a user asks to implement a feature or work with `.feature` files:
 When a user asks to modify an existing feature:
 
 0. **Context Loading Phase (MANDATORY FIRST STEP)**:
-   - **CRITICAL**: Before starting ANY feature modification analysis, you MUST load context from the ChromaDB MCP server 'cliplin-context'
-   - **Use MCP tools to query collections**: Use the ChromaDB MCP tools (chroma_query_documents) to load relevant context:
+   - **CRITICAL**: Before starting ANY feature modification analysis, you MUST load context from the Cliplin MCP server 'cliplin-context'
+   - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. chroma_query_documents) to load relevant context:
      * Query `features` collection to load the feature being modified and related features that might be affected
      * Query `business-and-architecture` collection to load business rules and ADRs that might impact the change
      * Query `tech-specs` collection to load technical constraints that must be considered
      * Query `uisi` collection if UI/UX changes are involved
    - **Query strategy**: Use semantic queries based on the feature domain, entities, and use cases to retrieve relevant context
-   - **Never proceed without loading context**: Do NOT start modification analysis until you have queried and loaded the relevant context from ChromaDB
+   - **Never proceed without loading context**: Do NOT start modification analysis until you have queried and loaded the relevant context from the context store (via Cliplin MCP)
    - **Context update check**: After loading context, verify if any context files need reindexing:
      * Run `cliplin reindex --dry-run` to check if context files are up to date
      * If context files are outdated, ask user for confirmation before reindexing
@@ -139,7 +139,7 @@ When a user asks to modify an existing feature:
    - **Generate implementation prompt**: Ask the user if they want you to run `cliplin feature apply <feature-filepath>` to generate a structured implementation prompt that includes the feature content and implementation instructions. If the user confirms, execute the command and use the generated prompt as part of your modification workflow
 
 1. **Impact Analysis**:
-   - **Use loaded context**: Apply the context already loaded from ChromaDB in phase 0
+   - **Use loaded context**: Apply the context already loaded from the context store (via Cliplin MCP) in phase 0
    - **Identify scenarios to modify**: Analyze which specific scenarios need changes:
      * Review scenario tags to understand current status
      * Identify scenarios tagged with `@status:modified` or scenarios that need modification
@@ -147,7 +147,7 @@ When a user asks to modify an existing feature:
    - Identify all features, components, and context files that depend on or relate to the scenarios being modified
    - Analyze the scope of changes required based on the loaded context
    - Check for breaking changes that might affect other features using the loaded feature dependencies
-   - If additional context is needed, query ChromaDB collections again with more specific queries
+   - If additional context is needed, query the context store collections again (via Cliplin MCP) with more specific queries
 
 2. **Modification Process**:
    - Follow the same phases as feature implementation (Analysis, Planning, Implementation, Completion)

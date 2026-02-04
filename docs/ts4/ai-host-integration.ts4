@@ -7,7 +7,7 @@ rules:
   - |
     Supported AI hosts:
     - **Cursor**: config file `.cursor/mcp.json`; key `mcpServers["cliplin-context"]`; host runs the MCP server process with project root as cwd when mcp.json is in the project
-    - **Claude Desktop**: config file `.claude/mcp_config.json`; key `mcpServers["cliplin-context"]`; same MCP server, different config path
+    - **Claude Desktop**: config file `.mcp.json` at project root; key `mcpServers["cliplin-context"]`; rules in `.claude/rules/`; same MCP server, different config path
     - Other MCP-compatible hosts may be added later; each has its own config file and location
   - |
     MCP command must be consistent across hosts (MUST):
@@ -22,7 +22,7 @@ rules:
   - |
     Host-specific quirks (document here when discovered):
     - Cursor: may send GetInstructions after initialize; server must expose `instructions` in initialize response (see ADR-004, system-modules TS4). Cursor typically uses project root as cwd when mcp.json is in the project
-    - Claude Desktop: same MCP protocol; config path is `.claude/mcp_config.json`. Same command pattern as Cursor
+    - Claude Desktop: same MCP protocol; config path is `.mcp.json` at project root; rules in `.claude/rules/`. Same command pattern as Cursor
   - |
     Checklist before merging changes to templates or MCP command:
     - [ ] create_cursor_mcp_config and create_claude_desktop_mcp_config both use the same command/args

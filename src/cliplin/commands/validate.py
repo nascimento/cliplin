@@ -2,8 +2,10 @@
 
 import sys
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 import typer
+import yaml
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -14,6 +16,7 @@ from cliplin.utils.chromadb import (
     get_chromadb_path,
     verify_collections,
 )
+from cliplin.utils.templates import AI_TOOL_CONFIGS
 
 console = Console()
 
@@ -87,15 +90,28 @@ def validate_command() -> None:
         )
         errors.append("Python version too old")
     
-    # Check for configuration files
+    # Check for configuration files and MCP file for configured AI tool
     console.print("\n[bold]Checking configuration files...[/bold]")
     config_file = project_root / ".cliplin" / "config.yaml"
     if config_file.exists():
         console.print(f"  [green]✓[/green] Config file exists")
+        ai_tool: Optional[str] = _get_ai_tool_from_config(config_file)
+        if ai_tool is not None and ai_tool in AI_TOOL_CONFIGS:
+            mcp_path = AI_TOOL_CONFIGS[ai_tool].get("mcp_file")
+            if mcp_path:
+                mcp_file = project_root / mcp_path
+                if mcp_file.exists():
+                    console.print(f"  [green]✓[/green] MCP config for {ai_tool!r} exists at {mcp_path}")
+                else:
+                    console.print(f"  [red]✗[/red] MCP config for {ai_tool!r} not found at {mcp_path}")
+                    errors.append(f"Missing MCP config file for ai_tool {ai_tool!r}: {mcp_path}")
+        elif ai_tool is not None and ai_tool not in AI_TOOL_CONFIGS:
+            console.print(f"  [yellow]⚠[/yellow]  Unknown ai_tool in config: {ai_tool!r}")
+            warnings.append(f"Unknown ai_tool in config: {ai_tool!r}")
     else:
         console.print(f"  [yellow]⚠[/yellow]  Config file not found (optional)")
         warnings.append("Config file not found")
-    
+
     # Summary
     console.print("\n" + "=" * 50)
     if errors:
@@ -112,6 +128,18 @@ def validate_command() -> None:
             f"All checks passed. {len(warnings)} warning(s).",
             border_style="green",
         ))
+
+
+def _get_ai_tool_from_config(config_path: Path) -> Optional[str]:
+    """Read ai_tool from .cliplin/config.yaml if present."""
+    if not config_path.exists():
+        return None
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            data: Dict[str, Any] = yaml.safe_load(f) or {}
+        return data.get("ai_tool")
+    except (yaml.YAMLError, IOError):
+        return None
 
 
 def is_cliplin_initialized(project_root: Path) -> bool:

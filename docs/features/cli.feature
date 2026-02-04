@@ -31,9 +31,9 @@ Feature: Cliplin CLI Tool
       | docs/features | Feature files (Gherkin) |
       | docs/ts4 | Technical specifications |
       | docs/ui-intent | UI Intent specifications |
-      | .cliplin/data/context | ChromaDB context storage |
-    And the CLI should initialize a ChromaDB database at `.cliplin/data/context/chroma.sqlite3`
-    And the CLI should create the required ChromaDB collections:
+      | .cliplin/data/context | Context store (project context store) |
+    And the CLI should initialize the context store at `.cliplin/data/context`
+    And the CLI should create the required context store collections:
       | Collection Name | Purpose |
       | business-and-architecture | Stores ADRs and business documentation |
       | features | Stores feature files |
@@ -53,12 +53,12 @@ Feature: Cliplin CLI Tool
     And the CLI should create `.cursor/rules/` directory structure
     And the CLI should create MCP server configuration files for Cursor
     And the CLI should create `.cursor/mcp.json` if it does not exist
-    And the CLI should configure `.cursor/mcp.json` with ChromaDB MCP server configuration
-    And the CLI should configure the ChromaDB MCP server for Cursor integration
-    And the CLI should create `.cursor/rules/context.mdc` with ChromaDB MCP configuration
+    And the CLI should configure `.cursor/mcp.json` with Cliplin context MCP server configuration
+    And the CLI should configure the Cliplin context MCP server for Cursor integration
+    And the CLI should create `.cursor/rules/context.mdc` with Cliplin context MCP configuration
     And the CLI should create `.cursor/rules/feature-processing.mdc` with feature processing rules
     And the CLI should validate that Cursor-specific configurations are correct
-    And the CLI should initialize ChromaDB collections as specified in the context rules
+    And the CLI should initialize context store collections as specified in the context rules
     And the CLI should display a success message indicating project initialization with Cursor is complete
 
   @status:implemented
@@ -70,12 +70,14 @@ Feature: Cliplin CLI Tool
     Then the CLI should create configuration files in the current directory
     And the CLI should generate configuration files adjusted for the AI tool ID "claude-desktop"
     And the CLI should create `.claude/` directory structure
+    And the CLI should create `.claude/rules/` directory structure for rule files
     And the CLI should create MCP server configuration files for Claude Desktop
-    And the CLI should create `.claude/mcp_config.json` if it does not exist
-    And the CLI should configure `.claude/mcp_config.json` with ChromaDB MCP server configuration
-    And the CLI should configure the ChromaDB MCP server for Claude Desktop integration
+    And the CLI should create `.mcp.json` at the root of the project if it does not exist
+    And the CLI should configure `.mcp.json` with Cliplin MCP server configuration
+    And the CLI should create `.claude/claude.md` with instructions on how to use the rules
+    And the CLI should configure the Cliplin MCP server for Claude Desktop integration
     And the CLI should validate that Claude Desktop-specific configurations are correct
-    And the CLI should initialize ChromaDB collections as specified in the context rules
+    And the CLI should initialize context store collections as specified in the context rules
     And the CLI should display a success message indicating project initialization with Claude Desktop is complete
 
   @status:implemented
@@ -90,8 +92,8 @@ Feature: Cliplin CLI Tool
       | docs/ts4 |
       | docs/ui-intent |
       | .cliplin/data/context |
-    And the CLI should verify that ChromaDB database file exists at `.cliplin/data/context/chroma.sqlite3`
-    And the CLI should verify that all required ChromaDB collections exist:
+    And the CLI should verify that the context store exists at `.cliplin/data/context`
+    And the CLI should verify that all required context store collections exist:
       | business-and-architecture |
       | features |
       | tech-specs |
@@ -99,26 +101,26 @@ Feature: Cliplin CLI Tool
     And the CLI should verify that configuration file exists at `.cliplin/config.yaml`
     And the CLI should verify that MCP server configuration files exist for the specified AI tool
     And if the AI tool is "cursor", the CLI should verify that `.cursor/mcp.json` exists
-    And if the AI tool is "claude-desktop", the CLI should verify that `.claude/mcp_config.json` exists
+    And if the AI tool is "claude-desktop", the CLI should verify that `.mcp.json` exists at the project root
     And the CLI should verify that Python version is 3.10 or higher
     And the CLI should verify that required dependencies are available
     And if any validation fails, the CLI should display clear error messages indicating what is missing or incorrect
 
   @status:implemented
   @changed:2024-01-15
-  Scenario: Initialize project with ChromaDB MCP server configuration
+  Scenario: Initialize project with Cliplin context MCP server configuration
     Given I have the Cliplin CLI tool installed
     And I am in a directory where I want to initialize a Cliplin project
     When I run `cliplin init --ai cursor`
-    Then the CLI should create MCP server configuration that enables ChromaDB context access
+    Then the CLI should create MCP server configuration that enables Cliplin context access
     And the CLI should create `.cursor/mcp.json` with MCP server configuration
-    And the `.cursor/mcp.json` file should define the ChromaDB MCP server with:
+    And the `.cursor/mcp.json` file should define the Cliplin context MCP server with:
       | Field | Description |
       | mcpServers | Object containing server configurations |
-      | cliplin-context | Server identifier for ChromaDB MCP |
-      | command | Command to start the ChromaDB MCP server |
-      | args | Arguments including database path |
-    And the MCP server configuration should specify the ChromaDB database path as `.cliplin/data/context/chroma.sqlite3`
+      | cliplin-context | Server identifier for Cliplin context MCP |
+      | command | Command to start the Cliplin MCP server |
+      | args | Arguments for the MCP server |
+    And the MCP server configuration should use the project context store path (e.g. `.cliplin/data/context`)
     And the MCP server configuration should define the collection mappings:
       | Collection | File Pattern | Directory |
       | business-and-architecture | *.md | docs/adrs, docs/business |
@@ -126,7 +128,7 @@ Feature: Cliplin CLI Tool
       | tech-specs | *.ts4 | docs/ts4 |
       | uisi | *.yaml | docs/ui-intent |
     And the MCP server configuration should be accessible to the AI tool (Cursor)
-    And the AI tool should be able to query and update the ChromaDB collections via MCP
+    And the AI tool should be able to query and update the context store collections via MCP
 
   @status:modified
   @changed:2024-01-15
@@ -137,7 +139,7 @@ Feature: Cliplin CLI Tool
     When I run `cliplin init --ai cursor`
     Then the CLI should create rule files that define:
       | Rule File | Purpose |
-      | .cursor/rules/context.mdc | Context indexing rules and ChromaDB collection mappings |
+      | .cursor/rules/context.mdc | Context indexing rules and context store collection mappings |
       | .cursor/rules/feature-processing.mdc | Feature file processing and implementation rules |
       | .cursor/rules/context-protocol-loading.mdc | Context loading protocol rules |
     And the rule files should specify automatic indexing behavior for context files
@@ -145,7 +147,7 @@ Feature: Cliplin CLI Tool
     And the rule files should define metadata requirements for indexed documents
     And the rule files should specify feature lifecycle management (pending, implemented, deprecated)
     And the rule files should define impact analysis requirements for feature changes
-    And the rule files should define context loading protocol requiring AI assistants to query ChromaDB collections before starting any task
+    And the rule files should define context loading protocol requiring AI assistants to query the context store (via Cliplin MCP) before starting any task
 
   @status:implemented
   @changed:2024-01-15
@@ -218,7 +220,7 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Reindex all context files
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
+    And the context store exists at `.cliplin/data/context`
     And there are context files in the project directories
     When I run `cliplin reindex`
     Then the CLI should scan for context files in the following directories:
@@ -228,9 +230,9 @@ Feature: Cliplin CLI Tool
       | docs/features | *.feature | features |
       | docs/ts4 | *.ts4 | tech-specs |
       | docs/ui-intent | *.yaml | uisi |
-    And the CLI should check if each file already exists in ChromaDB by file path
-    And for each file that exists, the CLI should update it in ChromaDB
-    And for each file that does not exist, the CLI should add it to ChromaDB
+    And the CLI should check if each file already exists in the context store by file path
+    And for each file that exists, the CLI should update it in the context store
+    And for each file that does not exist, the CLI should add it to the context store
     And the CLI should include proper metadata for each document:
       | Metadata Field | Description |
       | file_path | Relative path to file from project root |
@@ -245,7 +247,7 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Reindex specific context file
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
+    And the context store exists at `.cliplin/data/context`
     And there is a file `docs/ts4/my-spec.ts4` in the project
     When I run `cliplin reindex docs/ts4/my-spec.ts4`
     Then the CLI should validate that the file exists
@@ -256,9 +258,9 @@ Feature: Cliplin CLI Tool
       | docs/business/*.md | business-and-architecture |
       | docs/features/*.feature | features |
       | docs/ui-intent/*.yaml | uisi |
-    And the CLI should check if the file already exists in ChromaDB
+    And the CLI should check if the file already exists in the context store
     And if the file exists, the CLI should update it with new content
-    And if the file does not exist, the CLI should add it to ChromaDB
+    And if the file does not exist, the CLI should add it to the context store
     And the CLI should include proper metadata with file_path, type, and collection
     And the CLI should display a success message indicating the file was reindexed
 
@@ -266,7 +268,7 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Reindex all files of a specific type (TS4)
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
+    And the context store exists at `.cliplin/data/context`
     And there are multiple `.ts4` files in `docs/ts4/` directory
     When I run `cliplin reindex --type ts4`
     Then the CLI should scan for all `.ts4` files in `docs/ts4/` directory
@@ -278,7 +280,7 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Reindex all files of a specific type (features)
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
+    And the context store exists at `.cliplin/data/context`
     And there are multiple `.feature` files in `docs/features/` directory
     When I run `cliplin reindex --type feature`
     Then the CLI should scan for all `.feature` files in `docs/features/` directory
@@ -290,7 +292,7 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Reindex all files in a specific directory
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
+    And the context store exists at `.cliplin/data/context`
     And there are multiple files in `docs/business/` directory
     When I run `cliplin reindex --directory docs/business`
     Then the CLI should scan for all `.md` files in `docs/business/` directory
@@ -309,28 +311,28 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Review changes in context files without reindexing
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
+    And the context store exists at `.cliplin/data/context`
     And there are context files in the project
     When I run `cliplin reindex --dry-run`
     Then the CLI should scan for context files in all context directories
-    And the CLI should check which files exist in ChromaDB
+    And the CLI should check which files exist in the context store
     And the CLI should detect which files have been modified since last indexing
     And the CLI should display a report showing:
       | File Path | Status | Action |
       | docs/ts4/new-file.ts4 | New | Would add |
       | docs/ts4/existing-file.ts4 | Modified | Would update |
       | docs/ts4/unchanged-file.ts4 | Unchanged | Would skip |
-    And the CLI should not make any changes to ChromaDB
+    And the CLI should not make any changes to the context store
     And the CLI should display a summary of what would be reindexed
 
   @status:implemented
   @changed:2024-01-15
-  Scenario: Handle reindexing when ChromaDB is not initialized
+  Scenario: Handle reindexing when context store is not initialized
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database does not exist at `.cliplin/data/context/chroma.sqlite3`
+    And the context store does not exist at `.cliplin/data/context`
     When I run `cliplin reindex`
-    Then the CLI should detect that ChromaDB is not initialized
-    And the CLI should display an error message indicating that ChromaDB must be initialized first
+    Then the CLI should detect that the context store is not initialized
+    And the CLI should display an error message indicating that the project must be initialized first (e.g. run `cliplin init`)
     And the CLI should suggest running `cliplin init` to initialize the project
     And the CLI should exit with a non-zero status code
 
@@ -338,18 +340,18 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Handle reindexing when file does not exist
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
+    And the context store exists at `.cliplin/data/context`
     When I run `cliplin reindex docs/ts4/non-existent-file.ts4`
     Then the CLI should validate that the file exists
     And the CLI should display an error message indicating that the file does not exist
     And the CLI should exit with a non-zero status code
-    And no changes should be made to ChromaDB
+    And no changes should be made to the context store
 
   @status:implemented
   @changed:2024-01-15
   Scenario: Handle reindexing file outside context directories
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
+    And the context store exists at `.cliplin/data/context`
     And there is a file `src/main.py` in the project
     When I run `cliplin reindex src/main.py`
     Then the CLI should validate that the file is in a context directory
@@ -366,7 +368,7 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Reindex with verbose output
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
+    And the context store exists at `.cliplin/data/context`
     And there are context files in the project
     When I run `cliplin reindex --verbose`
     Then the CLI should display detailed information for each file being processed:
@@ -379,7 +381,7 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Reindex with confirmation prompt
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
+    And the context store exists at `.cliplin/data/context`
     And there are context files in the project
     When I run `cliplin reindex --interactive`
     Then the CLI should scan for context files
@@ -393,12 +395,12 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Reindex and handle duplicate documents
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
-    And a file `docs/ts4/test.ts4` already exists in ChromaDB with the same file path ID
+    And the context store exists at `.cliplin/data/context`
+    And a file `docs/ts4/test.ts4` already exists in the context store with the same file path ID
     When I run `cliplin reindex docs/ts4/test.ts4`
-    Then the CLI should detect that the document already exists in ChromaDB
+    Then the CLI should detect that the document already exists in the context store
     And the CLI should update the existing document instead of creating a duplicate
-    And the CLI should use `chroma_update_documents` instead of `chroma_add_documents`
+    And the CLI should use the MCP update-documents tool instead of add-documents
     And the CLI should update the document content, metadata, and embeddings
     And the CLI should display a message indicating the file was updated
 
@@ -406,8 +408,8 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Reindex with collection validation
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
-    And all required collections exist in ChromaDB
+    And the context store exists at `.cliplin/data/context`
+    And all required collections exist in the context store
     When I run `cliplin reindex`
     Then the CLI should verify that all required collections exist:
       | business-and-architecture |
@@ -422,7 +424,7 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Generate implementation prompt for a feature file
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
+    And the context store exists at `.cliplin/data/context`
     And there is a feature file `docs/features/my-feature.feature` in the project
     When I run `cliplin feature apply docs/features/my-feature.feature`
     Then the CLI should validate that the feature file exists
@@ -434,7 +436,7 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Handle feature apply when feature file does not exist
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
+    And the context store exists at `.cliplin/data/context`
     When I run `cliplin feature apply docs/features/non-existent.feature`
     Then the CLI should validate that the feature file exists
     And the CLI should display an error message indicating that the feature file does not exist
@@ -443,13 +445,13 @@ Feature: Cliplin CLI Tool
 
   @status:implemented
   @changed:2024-01-15
-  Scenario: Handle feature apply when ChromaDB is not initialized
+  Scenario: Handle feature apply when context store is not initialized
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database does not exist at `.cliplin/data/context/chroma.sqlite3`
+    And the context store does not exist at `.cliplin/data/context`
     And there is a feature file `docs/features/my-feature.feature` in the project
     When I run `cliplin feature apply docs/features/my-feature.feature`
-    Then the CLI should detect that ChromaDB is not initialized
-    And the CLI should display an error message indicating that ChromaDB must be initialized first
+    Then the CLI should detect that the context store is not initialized
+    And the CLI should display an error message indicating that the project must be initialized first (e.g. run `cliplin init`)
     And the CLI should suggest running `cliplin init` to initialize the project
     And the CLI should exit with a non-zero status code
     And no prompt should be generated
@@ -458,7 +460,7 @@ Feature: Cliplin CLI Tool
   @changed:2024-01-15
   Scenario: Handle feature apply when feature file is outside features directory
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
-    And the ChromaDB database exists at `.cliplin/data/context/chroma.sqlite3`
+    And the context store exists at `.cliplin/data/context`
     And there is a file `src/main.py` in the project
     When I run `cliplin feature apply src/main.py`
     Then the CLI should validate that the file is in the `docs/features/` directory

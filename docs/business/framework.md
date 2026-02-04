@@ -222,4 +222,4 @@ The MCP server exposes tools such as: list collections, query documents by seman
 
 ### Supported hosts and config consistency
 
-Supported AI hosts include **Cursor** (`.cursor/mcp.json`) and **Claude Desktop** (`.claude/mcp_config.json`). When changing how the MCP server is started (e.g. command or args in init templates), the same command must be used for all hosts so that every host runs the project's Cliplin with the same behavior. See `docs/ts4/ai-host-integration.ts4` for technical rules and the checklist when modifying templates or MCP-related commands.
+Supported AI hosts include **Cursor** (`.cursor/mcp.json`) and **Claude Desktop** (`.mcp.json` at project root; rules in `.claude/rules/`). When changing how the MCP server is started (e.g. command or args in init templates), the same command must be used for all hosts so that every host runs the project's Cliplin with the same behavior. See `docs/ts4/ai-host-integration.ts4` for technical rules and the checklist when modifying templates or MCP-related commands.

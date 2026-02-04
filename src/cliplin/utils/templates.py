@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from typing import Dict, Optional
 
+import yaml
 from rich.console import Console
 
 console = Console()
@@ -17,12 +18,40 @@ AI_TOOL_CONFIGS: Dict[str, Dict[str, Optional[str]]] = {
         "context_protocol_loading_file": ".cursor/rules/context-protocol-loading.mdc",
     },
     "claude-desktop": {
-        "rules_dir": ".claude",
-        "config_file": ".claude/mcp_config.json",
-        "feature_processing_file": ".claude/feature-processing.md",
-        "context_protocol_loading_file": ".claude/context-protocol-loading.md",
+        "rules_dir": ".claude/rules",
+        "config_file": ".mcp.json",
+        "feature_processing_file": ".claude/rules/feature-processing.md",
+        "context_protocol_loading_file": ".claude/rules/context-protocol-loading.md",
     },
 }
+
+
+def create_cliplin_config(target_dir: Path, ai_tool: Optional[str] = None) -> None:
+    """Create or update .cliplin/config.yaml with optional ai_tool for validate to check MCP file."""
+    cliplin_dir = target_dir / ".cliplin"
+    cliplin_dir.mkdir(parents=True, exist_ok=True)
+    config_path = cliplin_dir / "config.yaml"
+
+    config: Dict[str, Optional[str]] = {}
+    if config_path.exists():
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+                if isinstance(data, dict):
+                    config = dict(data)
+        except (yaml.YAMLError, IOError):
+            config = {}
+
+    if ai_tool is not None:
+        config["ai_tool"] = ai_tool
+
+    with open(config_path, "w", encoding="utf-8") as f:
+        yaml.safe_dump(config, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
+
+    if ai_tool is not None:
+        console.print(f"  [green]✓[/green] Created/updated .cliplin/config.yaml (ai_tool: {ai_tool})")
+    else:
+        console.print(f"  [green]✓[/green] Created .cliplin/config.yaml")
 
 
 def create_readme_file(target_dir: Path) -> None:
@@ -155,10 +184,10 @@ Every output must be traceable back to a specification.
 - Predictable AI behavior based on specifications
 - Clear separation of concerns across specification types
 - Versionable and maintainable specifications
-- All context available through ChromaDB indexing
+- All context available through the Cliplin MCP (context store) indexing
 
 ### Notes
-- This ADR should be indexed in ChromaDB collection `business-and-architecture`
+- This ADR should be indexed in the context store collection `business-and-architecture`
 - AI assistants should query this ADR and related context files before starting any work
 - All specifications must be kept up to date and properly indexed
 """
@@ -230,7 +259,7 @@ code_refs:  # Optional
 ### Usage
 
 - TS4 files are located in `docs/ts4/` directory
-- They are indexed in ChromaDB collection `tech-specs`
+- They are indexed in the context store collection `tech-specs`
 - AI assistants should query `tech-specs` collection before implementation to understand technical constraints
 - TS4 files complement ADRs: ADRs explain *why*, TS4 files define *how*
 
@@ -243,7 +272,7 @@ code_refs:  # Optional
 - Supports incremental documentation
 
 ### Notes
-- This ADR should be indexed in ChromaDB collection `business-and-architecture`
+- This ADR should be indexed in the context store collection `business-and-architecture`
 - When creating new TS4 files, follow the structure and naming conventions described here
 """
     
@@ -395,7 +424,7 @@ annotations:
 ### Usage
 
 - UI Intent files are located in `docs/ui-intent/` directory
-- They are indexed in ChromaDB collection `uisi`
+- They are indexed in the context store collection `uisi`
 - AI assistants should query `uisi` collection when implementing user interfaces
 - UI Intent allows AI to generate UI code without guessing user experience decisions
 
@@ -408,7 +437,7 @@ annotations:
 - Optimized for AI context retrieval
 
 ### Notes
-- This ADR should be indexed in ChromaDB collection `business-and-architecture`
+- This ADR should be indexed in the context store collection `business-and-architecture`
 - When creating new UI Intent files, follow the schema structure described here
 - UI Intent focuses on intent, not visual design details
 """
@@ -467,12 +496,12 @@ def create_ai_tool_config(target_dir: Path, ai_tool: str) -> None:
         protocol_file.write_text(protocol_content, encoding="utf-8")
         console.print(f"  [green]✓[/green] Created {config['context_protocol_loading_file']}")
     
-    # Create context.md for Claude Desktop (similar to context.mdc for Cursor)
+    # Create context.md for Claude Desktop in .claude/rules (similar to context.mdc for Cursor)
     if ai_tool == "claude-desktop":
-        context_file = target_dir / ".claude" / "context.md"
+        context_file = target_dir / ".claude" / "rules" / "context.md"
         context_content = get_cursor_context_content()
         context_file.write_text(context_content, encoding="utf-8")
-        console.print(f"  [green]✓[/green] Created .claude/context.md")
+        console.print(f"  [green]✓[/green] Created .claude/rules/context.md")
         
         # Create main instructions file that consolidates all rules
         instructions_file = target_dir / ".claude" / "instructions.md"
@@ -480,15 +509,15 @@ def create_ai_tool_config(target_dir: Path, ai_tool: str) -> None:
         instructions_file.write_text(instructions_content, encoding="utf-8")
         console.print(f"  [green]✓[/green] Created .claude/instructions.md")
         
-        # Create README with instructions on how to use the rules
-        readme_file = target_dir / ".claude" / "README.md"
-        readme_content = get_claude_desktop_readme_content()
-        readme_file.write_text(readme_content, encoding="utf-8")
-        console.print(f"  [green]✓[/green] Created .claude/README.md")
+        # Create claude.md with instructions on how to use the rules (replaces README)
+        claude_md_file = target_dir / ".claude" / "claude.md"
+        claude_md_content = get_claude_desktop_claude_md_content()
+        claude_md_file.write_text(claude_md_content, encoding="utf-8")
+        console.print(f"  [green]✓[/green] Created .claude/claude.md")
 
 
 def create_cursor_mcp_config(target_dir: Path) -> None:
-    """Create or update .cursor/mcp.json with ChromaDB MCP server configuration."""
+    """Create or update .cursor/mcp.json with Cliplin context MCP server configuration."""
     mcp_file = target_dir / ".cursor" / "mcp.json"
     mcp_file.parent.mkdir(parents=True, exist_ok=True)
     
@@ -529,9 +558,8 @@ def create_cursor_mcp_config(target_dir: Path) -> None:
 
 
 def create_claude_desktop_mcp_config(target_dir: Path) -> None:
-    """Create or update .claude/mcp_config.json with ChromaDB MCP server configuration."""
-    mcp_file = target_dir / ".claude" / "mcp_config.json"
-    mcp_file.parent.mkdir(parents=True, exist_ok=True)
+    """Create or update .mcp.json at project root with Cliplin context MCP server configuration."""
+    mcp_file = target_dir / ".mcp.json"
     
     # Cliplin Storage MCP server (uses cwd as project root; context store at .cliplin/data/context).
     # Use "uv run cliplin mcp" so the host runs the project's cliplin (with instructions); "cliplin" alone may resolve to a global install.
@@ -558,11 +586,11 @@ def create_claude_desktop_mcp_config(target_dir: Path) -> None:
     if "cliplin-context" in existing_config["mcpServers"]:
         # Update existing configuration
         existing_config["mcpServers"]["cliplin-context"] = cliplin_server_config
-        console.print(f"  [yellow]⚠[/yellow]  Updated existing Cliplin MCP server in .claude/mcp_config.json")
+        console.print(f"  [yellow]⚠[/yellow]  Updated existing Cliplin MCP server in .mcp.json")
     else:
         # Add new server configuration
         existing_config["mcpServers"]["cliplin-context"] = cliplin_server_config
-        console.print(f"  [green]✓[/green] Created .claude/mcp_config.json")
+        console.print(f"  [green]✓[/green] Created .mcp.json")
     
     # Write updated configuration
     with open(mcp_file, "w", encoding="utf-8") as f:
@@ -579,13 +607,13 @@ alwaysApply: true
 
 **CRITICAL RULE**: Before starting ANY planning, coding, or thinking task, you MUST:
 
-1. **Load context from ChromaDB MCP server**: Use the 'cliplin-context' MCP server (ChromaDB MCP server) as the source of truth
-2. **Query relevant collections**: Use ChromaDB MCP tools (chroma_query_documents) to query and load relevant context from the appropriate collections:
+1. **Load context from Cliplin MCP server**: Use the 'cliplin-context' MCP server (Cliplin context MCP server) as the source of truth
+2. **Query relevant collections**: Use Cliplin MCP tools (e.g. chroma_query_documents) to query and load relevant context from the appropriate collections:
    - 'business-and-architecture' collection: ADRs and business documentation md files located at 'docs/adrs' and 'docs/business' folder
    - 'features' collection: .feature files located at 'docs/features' folder
    - 'tech-specs' collection: .ts4 files located at 'docs/ts4' folder
    - 'uisi' collection: .yaml files located at 'docs/ui-intent' folder
-3. **Never proceed without context**: Do NOT start any task until you have queried and loaded the relevant context from ChromaDB collections
+3. **Never proceed without context**: Do NOT start any task until you have queried and loaded the relevant context from the context store collections (via Cliplin MCP)
 4. **Use semantic queries**: Query collections using semantic search based on the task domain, entities, and requirements to retrieve the most relevant context
    
 ## Context File Indexing Rules
@@ -625,7 +653,7 @@ When any context file is created or modified, you MUST:
 
 3. **Indexing process** (only after user confirmation):
    - **Preferred method**: Use the Cliplin CLI command `cliplin reindex <file-path>` which handles all the complexity automatically
-   - **Alternative method** (if CLI not available): Use ChromaDB MCP tools directly:
+   - **Alternative method** (if CLI not available): Use Cliplin MCP tools directly:
      * Check if the document already exists by querying the collection with the file path as ID using `chroma_get_documents` or `chroma_query_documents`
      * If it exists, use `chroma_update_documents` to update it
      * If it doesn't exist, use `chroma_add_documents` to add it
@@ -634,14 +662,14 @@ When any context file is created or modified, you MUST:
      * Avoid duplicated files and outdated or deleted files in the collection
 
 4. **Manual re-indexing requests**: When a user explicitly requests to reindex files (e.g., "reindexa los archivos en docs/business"), you should:
-   - **Use the Cliplin CLI command**: Run `cliplin reindex` with appropriate options instead of manually using ChromaDB MCP tools
+   - **Use the Cliplin CLI command**: Run `cliplin reindex` with appropriate options instead of manually using Cliplin MCP tools
    - For specific files: `cliplin reindex docs/path/to/file.md`
    - For directories: `cliplin reindex --directory docs/business`
    - For file types: `cliplin reindex --type ts4`
    - For preview: `cliplin reindex --dry-run`
    - For verbose output: `cliplin reindex --verbose`
    - The CLI command handles all the complexity of checking for existing documents, updating metadata, and managing collections
-   - Only use ChromaDB MCP tools directly if the CLI is not available or for specific advanced operations
+   - Only use Cliplin MCP tools directly if the CLI is not available or for specific advanced operations
 
 5. **Automatic indexing workflow**:
    - When context files are created or modified, **prefer using the CLI command** for indexing:
@@ -666,14 +694,14 @@ alwaysApply: true
 When a user asks to implement a feature or work with `.feature` files:
 
 0. **Context Loading Phase (MANDATORY FIRST STEP)**:
-   - **CRITICAL**: Before starting ANY feature analysis or implementation, you MUST load context from the ChromaDB MCP server 'cliplin-context'
-   - **Use MCP tools to query collections**: Use the ChromaDB MCP tools (chroma_query_documents) to load relevant context from ALL collections:
+   - **CRITICAL**: Before starting ANY feature analysis or implementation, you MUST load context from the Cliplin MCP server 'cliplin-context'
+   - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. chroma_query_documents) to load relevant context from ALL collections:
      * Query `business-and-architecture` collection to load ADRs and business documentation
      * Query `tech-specs` collection to load technical specifications and implementation rules
      * Query `features` collection to load related or dependent features
      * Query `uisi` collection to load UI/UX requirements if applicable
    - **Query strategy**: Use semantic queries based on the feature domain, entities, and use cases to retrieve relevant context
-   - **Never proceed without loading context**: Do NOT start feature analysis or implementation until you have queried and loaded the relevant context from ChromaDB
+   - **Never proceed without loading context**: Do NOT start feature analysis or implementation until you have queried and loaded the relevant context from the context store (via Cliplin MCP)
    - **Context update check**: After loading context, verify if any context files need reindexing:
      * Run `cliplin reindex --dry-run` to check if context files are up to date
      * If context files are outdated, ask user for confirmation before reindexing
@@ -697,7 +725,7 @@ When a user asks to implement a feature or work with `.feature` files:
      * Maintain deprecated scenarios as-is without modifications
    - Extract business rules and acceptance criteria
    - Identify domain entities, use cases, and boundaries
-   - **Use loaded context**: Apply the context loaded from ChromaDB in phase 0 to inform your analysis:
+   - **Use loaded context**: Apply the context loaded from the context store (via Cliplin MCP) in phase 0 to inform your analysis:
      * Use business rules from `business-and-architecture` collection
      * Apply technical constraints from `tech-specs` collection
      * Consider dependencies from related features in `features` collection
@@ -707,7 +735,7 @@ When a user asks to implement a feature or work with `.feature` files:
    Create a comprehensive plan that includes:
    
    **a) Architecture Analysis**:
-   - **Use loaded context**: Apply the context already loaded from ChromaDB in phase 0
+   - **Use loaded context**: Apply the context already loaded from the context store (via Cliplin MCP) in phase 0
    - Use ADRs from `business-and-architecture` collection to understand existing architecture decisions
    - Apply technical constraints and patterns from `tech-specs` collection
    - Identify which domain layer components are needed (entities, value objects, use cases)
@@ -715,7 +743,7 @@ When a user asks to implement a feature or work with `.feature` files:
    - Identify adapters needed (repositories, external services, etc.)
    - Map feature scenarios to use cases
    - Ensure consistency with existing patterns documented in the loaded context
-   - If additional context is needed, query ChromaDB collections again with more specific queries
+   - If additional context is needed, query the context store collections again (via Cliplin MCP) with more specific queries
    
    **b) Business Logic Implementation**:
    - List all business logic components to implement
@@ -772,7 +800,7 @@ When a user asks to implement a feature or work with `.feature` files:
      * **Do NOT modify deprecated scenarios**: Leave scenarios with `@status:deprecated` unchanged
      * Ensure the feature file is properly formatted and readable
      * All code and tests must be traceable back to the specific scenarios
-     * **Reindex the updated feature file**: Run `cliplin reindex docs/features/feature-name.feature` to update ChromaDB
+     * **Reindex the updated feature file**: Run `cliplin reindex docs/features/feature-name.feature` to update the context store
      * If you created or modified any context files (ADRs, TS4, business docs), reindex them as well
      * This ensures the context remains synchronized with the implementation
 
@@ -781,14 +809,14 @@ When a user asks to implement a feature or work with `.feature` files:
 When a user asks to modify an existing feature:
 
 0. **Context Loading Phase (MANDATORY FIRST STEP)**:
-   - **CRITICAL**: Before starting ANY feature modification analysis, you MUST load context from the ChromaDB MCP server 'cliplin-context'
-   - **Use MCP tools to query collections**: Use the ChromaDB MCP tools (chroma_query_documents) to load relevant context:
+   - **CRITICAL**: Before starting ANY feature modification analysis, you MUST load context from the Cliplin MCP server 'cliplin-context'
+   - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. chroma_query_documents) to load relevant context:
      * Query `features` collection to load the feature being modified and related features that might be affected
      * Query `business-and-architecture` collection to load business rules and ADRs that might impact the change
      * Query `tech-specs` collection to load technical constraints that must be considered
      * Query `uisi` collection if UI/UX changes are involved
    - **Query strategy**: Use semantic queries based on the feature domain, entities, and use cases to retrieve relevant context
-   - **Never proceed without loading context**: Do NOT start modification analysis until you have queried and loaded the relevant context from ChromaDB
+   - **Never proceed without loading context**: Do NOT start modification analysis until you have queried and loaded the relevant context from the context store (via Cliplin MCP)
    - **Context update check**: After loading context, verify if any context files need reindexing:
      * Run `cliplin reindex --dry-run` to check if context files are up to date
      * If context files are outdated, ask user for confirmation before reindexing
@@ -796,7 +824,7 @@ When a user asks to modify an existing feature:
    - **Generate implementation prompt**: Ask the user if they want you to run `cliplin feature apply <feature-filepath>` to generate a structured implementation prompt that includes the feature content and implementation instructions. If the user confirms, execute the command and use the generated prompt as part of your modification workflow
 
 1. **Impact Analysis**:
-   - **Use loaded context**: Apply the context already loaded from ChromaDB in phase 0
+   - **Use loaded context**: Apply the context already loaded from the context store (via Cliplin MCP) in phase 0
    - **Identify scenarios to modify**: Analyze which specific scenarios need changes:
      * Review scenario tags to understand current status
      * Identify scenarios tagged with `@status:modified` or scenarios that need modification
@@ -804,7 +832,7 @@ When a user asks to modify an existing feature:
    - Identify all features, components, and context files that depend on or relate to the scenarios being modified
    - Analyze the scope of changes required based on the loaded context
    - Check for breaking changes that might affect other features using the loaded feature dependencies
-   - If additional context is needed, query ChromaDB collections again with more specific queries
+   - If additional context is needed, query the context store collections again (via Cliplin MCP) with more specific queries
 
 2. **Modification Process**:
    - Follow the same phases as feature implementation (Analysis, Planning, Implementation, Completion)
@@ -879,7 +907,7 @@ alwaysApply: true
 
 ### When to Load Context (Trigger Words and Actions)
 
-**MANDATORY**: You MUST load context from ChromaDB BEFORE any of these actions:
+**MANDATORY**: You MUST load context from the Cliplin MCP server (context store) BEFORE any of these actions:
 
 #### Action Types Requiring Context:
 - **Debugging**: Finding and fixing bugs, investigating errors, troubleshooting issues
@@ -912,7 +940,7 @@ alwaysApply: true
 
 ### Mandatory Context Loading Steps
 
-1. **Query ChromaDB Collections First**: Before beginning ANY task, you MUST query the relevant ChromaDB collections using the 'cliplin-context' MCP server to load context.
+1. **Query context store collections first**: Before beginning ANY task, you MUST query the relevant context store collections using the 'cliplin-context' MCP server (Cliplin MCP) to load context.
 
 2. **Determine Relevant Collections**: Based on the task domain, entities, and requirements, identify which collections contain relevant context:
    - `business-and-architecture`: ADRs, business documentation, architectural decisions
@@ -935,7 +963,7 @@ alwaysApply: true
    - Query `uisi` if UI/UX work is involved
 
 5. **Never Proceed Without Context**: Do NOT start any task until you have:
-   - Queried and loaded relevant context from ChromaDB collections
+   - Queried and loaded relevant context from the context store collections (via Cliplin MCP)
    - Reviewed the loaded context to understand constraints and requirements
    - Verified that context is current (check for outdated files if needed)
 
@@ -1065,7 +1093,7 @@ This file contains all the rules and protocols that Claude should follow when wo
 **IMPORTANT**: These instructions should be loaded at the beginning of each conversation or session. You can:
 1. Copy and paste this entire file into Claude Desktop at the start of a conversation
 2. Reference this file when Claude asks about project rules
-3. Use the MCP server to access ChromaDB context (configured in `.claude/mcp_config.json`)
+3. Use the Cliplin MCP server to access project context (configured in `.mcp.json` at project root)
 
 ---
 
@@ -1081,19 +1109,19 @@ This file contains all the rules and protocols that Claude should follow when wo
 """
 
 
-def get_claude_desktop_readme_content() -> str:
-    """Get the README content for Claude Desktop directory."""
+def get_claude_desktop_claude_md_content() -> str:
+    """Get the claude.md content for Claude Desktop directory."""
     return """# Claude Desktop Configuration for Cliplin
 
-This directory contains configuration files and rules for using Claude Desktop with this Cliplin project.
+This directory contains rules and instructions for using Claude Desktop with this Cliplin project. Rules are loaded from `.claude/rules/`.
 
-## Files in this Directory
+## Files
 
-- **`mcp_config.json`**: MCP server configuration for ChromaDB context access
+- **`.mcp.json`** (at project root): MCP server configuration for Cliplin context access
 - **`instructions.md`**: Consolidated instructions file with all project rules (LOAD THIS FIRST)
-- **`context.md`**: Context indexing rules and ChromaDB collection mappings
-- **`feature-processing.md`**: Feature file processing and implementation rules
-- **`context-protocol-loading.md`**: Context loading protocol rules
+- **`rules/context.md`**: Context indexing rules and context store collection mappings
+- **`rules/feature-processing.md`**: Feature file processing and implementation rules
+- **`rules/context-protocol-loading.md`**: Context loading protocol rules
 
 ## How to Load Rules in Claude Desktop
 
@@ -1103,35 +1131,35 @@ At the start of each conversation, copy and paste the contents of `instructions.
 
 ### Option 2: Create a Claude Skill (Advanced)
 
-You can create a Claude Skill from this directory:
+You can create a Claude Skill from the `.claude` directory:
 
-1. Zip the entire `.claude` directory (excluding `mcp_config.json`)
+1. Zip the `.claude` directory (MCP config is at project root in `.mcp.json`, not inside `.claude`)
 2. In Claude Desktop, go to **Settings > Extensions**
 3. Click "Advanced Settings" and find "Extension Developer"
 4. Click "Install Extension..." and select the ZIP file
 5. Claude will automatically apply these rules in relevant contexts
 
-### Option 3: Reference Individual Files
+### Option 3: Reference Individual Rule Files
 
-You can reference individual rule files as needed:
-- For context loading: reference `context-protocol-loading.md`
-- For feature work: reference `feature-processing.md`
-- For indexing: reference `context.md`
+Reference files under `.claude/rules/` as needed:
+- For context loading: reference `rules/context-protocol-loading.md`
+- For feature work: reference `rules/feature-processing.md`
+- For indexing: reference `rules/context.md`
 
 ## MCP Server Configuration
 
-The `mcp_config.json` file configures the ChromaDB MCP server. This allows Claude to:
-- Query project context from ChromaDB collections
+The `.mcp.json` file at the project root configures the Cliplin context MCP server. This allows Claude to:
+- Query project context from the context store collections (via Cliplin MCP)
 - Access ADRs, features, TS4 specs, and UI Intent files
 - Load relevant context before starting any task
 
-Make sure the MCP server is properly configured in Claude Desktop's settings.
+Make sure the MCP server is properly configured in Claude Desktop's settings to use the project's `.mcp.json`.
 
 ## Important Notes
 
-- **Always load context first**: Before any coding, debugging, or implementation task, query ChromaDB collections
+- **Always load context first**: Before any coding, debugging, or implementation task, query the context store collections via the Cliplin MCP server
 - **Follow the protocol**: The context loading protocol is mandatory and prevents wasted tokens and misaligned code
-- **Update rules**: If you modify any rule files, reload them in Claude Desktop
+- **Update rules**: If you modify any rule files in `.claude/rules/`, reload them in Claude Desktop
 
 For more information about Cliplin, see the main project README.
 """

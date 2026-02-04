@@ -8,7 +8,7 @@ alwaysApply: true
 
 ### When to Load Context (Trigger Words and Actions)
 
-**MANDATORY**: You MUST load context from ChromaDB BEFORE any of these actions:
+**MANDATORY**: You MUST load context from the Cliplin MCP server (context store) BEFORE any of these actions:
 
 #### Action Types Requiring Context:
 - **Debugging**: Finding and fixing bugs, investigating errors, troubleshooting issues
@@ -41,7 +41,7 @@ alwaysApply: true
 
 ### Mandatory Context Loading Steps
 
-1. **Query ChromaDB Collections First**: Before beginning ANY task, you MUST query the relevant ChromaDB collections using the 'cliplin-context' MCP server to load context.
+1. **Query context store collections first**: Before beginning ANY task, you MUST query the relevant context store collections using the 'cliplin-context' MCP server (Cliplin MCP) to load context.
 
 2. **Determine Relevant Collections**: Based on the task domain, entities, and requirements, identify which collections contain relevant context:
    - `business-and-architecture`: ADRs, business documentation, architectural decisions
@@ -64,7 +64,7 @@ alwaysApply: true
    - Query `uisi` if UI/UX work is involved
 
 5. **Never Proceed Without Context**: Do NOT start any task until you have:
-   - Queried and loaded relevant context from ChromaDB collections
+   - Queried and loaded relevant context from the context store collections (via Cliplin MCP)
    - Reviewed the loaded context to understand constraints and requirements
    - Verified that context is current (check for outdated files if needed)
 

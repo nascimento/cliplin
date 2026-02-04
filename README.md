@@ -93,7 +93,7 @@ Cliplin automatically creates the directory structure and configures everything 
 │   └── ui-intent/      # UI specifications
 └── .cliplin/
     ├── config.yaml
-    └── data/context/   # ChromaDB database for context
+    └── data/context/   # Context store (project context store)
 ```
 
 **Note:** Cliplin tools (SPAs) are part of the Cliplin package installation, not your project directory.
@@ -141,7 +141,7 @@ cliplin reindex --type ts4
 cliplin reindex --dry-run
 ```
 
-Cliplin uses **ChromaDB** to semantically index and search all your specifications, enabling AI to access relevant context in real-time.
+Cliplin uses the **Cliplin MCP** (context store) to semantically index and search all your specifications, enabling AI to access relevant context in real-time.
 
 ### 4. Generate ADR Prompts
 
@@ -178,7 +178,7 @@ With Cliplin configured, you can tell your AI assistant:
 > "Implement the authentication feature"
 
 And the AI will:
-1. ✅ Automatically load context from ChromaDB
+1. ✅ Automatically load context from the Cliplin MCP server (context store)
 2. ✅ Read the feature file and related specifications
 3. ✅ Apply technical rules defined in TS4
 4. ✅ Respect architectural decisions in ADRs
@@ -198,7 +198,7 @@ And the AI will:
 ### 🤖 For AI-Assisted Development
 
 - **Predictable behavior**: AI acts on specifications, not guessing
-- **Structured context**: ChromaDB provides semantic search of specifications
+- **Structured context**: The Cliplin MCP provides semantic search of specifications via the context store
 - **Guaranteed consistency**: Technical rules (TS4) ensure uniform code
 - **Fewer iterations**: Clear specifications reduce misunderstandings
 
@@ -244,7 +244,7 @@ cliplin tool --list             # List all available tools
 
 ## Requirements
 
-- Python 3.10 or higher (Python 3.11 may have compatibility issues with ChromaDB on Windows)
+- Python 3.10 or higher (Python 3.11 may have compatibility issues with the context store backend on Windows)
 - [uv](https://github.com/astral-sh/uv) (Astral UV) for installation
 - A compatible AI assistant (Cursor, Claude Desktop, etc.)
 
@@ -252,15 +252,15 @@ cliplin tool --list             # List all available tools
 
 If you're installing Cliplin on Windows, you'll need:
 
-1. **Microsoft Visual C++ Build Tools** (Required for ChromaDB dependency `hnswlib`)
+1. **Microsoft Visual C++ Build Tools** (Required for the context store backend dependency `hnswlib`)
    - Download and install from: https://visualstudio.microsoft.com/visual-cpp-build-tools/
    - Requires Microsoft Visual C++ 14.0 or greater
    - Without this, you'll see an error: `error: Microsoft Visual C++ 14.0 or greater is required`
    - **Important**: Install this BEFORE installing Cliplin
 
 2. **Python Version Compatibility**
-   - Recommended: Python 3.10 (most stable with ChromaDB on Windows)
-   - Python 3.11 may have compatibility issues with ChromaDB
+   - Recommended: Python 3.10 (most stable with the context store backend on Windows)
+   - Python 3.11 may have compatibility issues with the context store backend
    - Verify your Python version: `python --version`
 
 3. **Path Considerations**
@@ -292,7 +292,7 @@ That's the essence of Cliplin.
 1. **Install Microsoft Visual C++ Build Tools** (if not already installed):
    - Download from: https://visualstudio.microsoft.com/visual-cpp-build-tools/
    - Run the installer and select "C++ build tools"
-   - This is required for ChromaDB's `hnswlib` dependency
+   - This is required for the context store backend's `hnswlib` dependency
 
 2. **Verify Python Installation**:
    ```powershell
@@ -358,7 +358,7 @@ If you encounter issues during installation:
    - Set environment variable: `$env:PYTHONIOENCODING="utf-8"` in PowerShell
    - Or ensure your system locale supports UTF-8
 
-3. **ChromaDB indexing fails**
+3. **Context store indexing fails**
    - Ensure you have write permissions in your project directory
    - Try running PowerShell/Command Prompt as Administrator
    - Check that the path length is reasonable (<260 characters recommended)
@@ -378,7 +378,7 @@ cliplin init --ai cursor
 
 ### Configure Claude Desktop
 
-If you're using Claude Desktop, Cliplin creates rule files in the `.claude/` directory. To use these rules:
+If you're using Claude Desktop, Cliplin creates rule files in `.claude/rules/` and MCP config at project root in `.mcp.json`. To use these rules:
 
 **Step 1: Load Instructions at the Start of Each Conversation**
 
@@ -391,7 +391,7 @@ At the beginning of each conversation in Claude Desktop, copy and paste the cont
 4. Claude will now follow all project rules and protocols
 
 **Why This is Important:**
-- Ensures Claude loads context from ChromaDB before any task
+- Ensures Claude loads context from the Cliplin MCP server (context store) before any task
 - Applies all technical rules and architectural constraints
 - Prevents wasted tokens and misaligned code
 - Maintains consistency with project specifications
@@ -399,7 +399,7 @@ At the beginning of each conversation in Claude Desktop, copy and paste the cont
 **Alternative: Create a Claude Skill (Advanced)**
 
 You can also create a Claude Skill from the `.claude/` directory for automatic rule loading:
-1. Zip the `.claude/` directory (excluding `mcp_config.json`)
+1. Zip the `.claude/` directory (MCP config is at project root in `.mcp.json`, not inside `.claude/`)
 2. In Claude Desktop: **Settings > Extensions**
 3. Click "Advanced Settings" > "Extension Developer"
 4. Click "Install Extension..." and select the ZIP file

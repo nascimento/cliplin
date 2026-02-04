@@ -6,13 +6,13 @@ alwaysApply: true
 
 **CRITICAL RULE**: Before starting ANY planning, coding, or thinking task, you MUST:
 
-1. **Load context from ChromaDB MCP server**: Use the 'cliplin-context' MCP server (ChromaDB MCP server) as the source of truth
-2. **Query relevant collections**: Use ChromaDB MCP tools (chroma_query_documents) to query and load relevant context from the appropriate collections:
+1. **Load context from Cliplin MCP server**: Use the 'cliplin-context' MCP server (Cliplin context MCP server) as the source of truth
+2. **Query relevant collections**: Use Cliplin MCP tools (e.g. chroma_query_documents) to query and load relevant context from the appropriate collections:
    - 'business-and-architecture' collection: ADRs and business documentation md files located at 'docs/adrs' and 'docs/business' folder
    - 'features' collection: .feature files located at 'docs/features' folder
    - 'tech-specs' collection: .ts4 files located at 'docs/ts4' folder
    - 'uisi' collection: .yaml files located at 'docs/ui-intent' folder
-3. **Never proceed without context**: Do NOT start any task until you have queried and loaded the relevant context from ChromaDB collections
+3. **Never proceed without context**: Do NOT start any task until you have queried and loaded the relevant context from the context store collections (via Cliplin MCP)
 4. **Use semantic queries**: Query collections using semantic search based on the task domain, entities, and requirements to retrieve the most relevant context
    
 ## Context File Indexing Rules
@@ -52,7 +52,7 @@ When any context file is created or modified, you MUST:
 
 3. **Indexing process** (only after user confirmation):
    - **Preferred method**: Use the Cliplin CLI command `cliplin reindex <file-path>` which handles all the complexity automatically
-   - **Alternative method** (if CLI not available): Use ChromaDB MCP tools directly:
+   - **Alternative method** (if CLI not available): Use Cliplin MCP tools directly:
      * Check if the document already exists by querying the collection with the file path as ID using `chroma_get_documents` or `chroma_query_documents`
      * If it exists, use `chroma_update_documents` to update it
      * If it doesn't exist, use `chroma_add_documents` to add it
@@ -61,14 +61,14 @@ When any context file is created or modified, you MUST:
      * Avoid duplicated files and outdated or deleted files in the collection
 
 4. **Manual re-indexing requests**: When a user explicitly requests to reindex files (e.g., "reindexa los archivos en docs/business"), you should:
-   - **Use the Cliplin CLI command**: Run `cliplin reindex` with appropriate options instead of manually using ChromaDB MCP tools
+   - **Use the Cliplin CLI command**: Run `cliplin reindex` with appropriate options instead of manually using Cliplin MCP tools
    - For specific files: `cliplin reindex docs/path/to/file.md`
    - For directories: `cliplin reindex --directory docs/business`
    - For file types: `cliplin reindex --type ts4`
    - For preview: `cliplin reindex --dry-run`
    - For verbose output: `cliplin reindex --verbose`
    - The CLI command handles all the complexity of checking for existing documents, updating metadata, and managing collections
-   - Only use ChromaDB MCP tools directly if the CLI is not available or for specific advanced operations
+   - Only use Cliplin MCP tools directly if the CLI is not available or for specific advanced operations
 
 5. **Automatic indexing workflow**:
    - When context files are created or modified, **prefer using the CLI command** for indexing:

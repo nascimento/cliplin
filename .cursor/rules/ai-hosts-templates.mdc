@@ -9,7 +9,7 @@ When you change **templates** or **MCP-related commands** in this project, you M
 ### Supported hosts
 
 - **Cursor**: MCP config in `.cursor/mcp.json` → `mcpServers["cliplin-context"]`
-- **Claude Desktop**: MCP config in `.claude/mcp_config.json` → `mcpServers["cliplin-context"]`
+- **Claude Desktop**: MCP config in `.mcp.json` at project root → `mcpServers["cliplin-context"]`; rules in `.claude/rules/`
 
 ### Rules
 
@@ -19,7 +19,7 @@ When you change **templates** or **MCP-related commands** in this project, you M
 2. **Update both config generators together**  
    In `src/cliplin/utils/templates.py`:
    - `create_cursor_mcp_config` → writes `.cursor/mcp.json`
-   - `create_claude_desktop_mcp_config` → writes `.claude/mcp_config.json`  
+   - `create_claude_desktop_mcp_config` → writes `.mcp.json` at project root  
    If you change the MCP command, args, or env in one, change the other in the same edit. Do not update only Cursor or only Claude Desktop.
 
 3. **New hosts**  
