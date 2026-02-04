@@ -608,7 +608,7 @@ alwaysApply: true
 **CRITICAL RULE**: Before starting ANY planning, coding, or thinking task, you MUST:
 
 1. **Load context from Cliplin MCP server**: Use the 'cliplin-context' MCP server (Cliplin context MCP server) as the source of truth
-2. **Query relevant collections**: Use Cliplin MCP tools (e.g. chroma_query_documents) to query and load relevant context from the appropriate collections:
+2. **Query relevant collections**: Use Cliplin MCP tools (e.g. context_query_documents) to query and load relevant context from the appropriate collections:
    - 'business-and-architecture' collection: ADRs and business documentation md files located at 'docs/adrs' and 'docs/business' folder
    - 'features' collection: .feature files located at 'docs/features' folder
    - 'tech-specs' collection: .ts4 files located at 'docs/ts4' folder
@@ -632,7 +632,7 @@ The following file types should be indexed into their respective collections (se
 - When indexing documents, always include proper metadata as an array of objects with the following structure: `[{'file_path': 'relative/path/to/file', 'type': 'ts4|adr|project-doc|feature|ui-intent', 'collection': 'target-collection-name'}]`
 - Each document in the documents array must have a corresponding metadata object in the metadatas array at the same index
 - Use the file path (relative to project root) as the document ID when indexing (e.g., 'docs/ts4/ts4-project-structure.ts4')
-- Before indexing a document, check if it already exists by querying the collection with the file path as ID using `chroma_get_documents` or `chroma_query_documents`. If it exists, use `chroma_update_documents` to update it instead of adding a duplicate
+- Before indexing a document, check if it already exists by querying the collection with the file path as ID using `context_get_documents` or `context_query_documents`. If it exists, use `context_update_documents` to update it instead of adding a duplicate
 
 ### Automatic Detection and User Confirmation
 
@@ -654,9 +654,9 @@ When any context file is created or modified, you MUST:
 3. **Indexing process** (only after user confirmation):
    - **Preferred method**: Use the Cliplin CLI command `cliplin reindex <file-path>` which handles all the complexity automatically
    - **Alternative method** (if CLI not available): Use Cliplin MCP tools directly:
-     * Check if the document already exists by querying the collection with the file path as ID using `chroma_get_documents` or `chroma_query_documents`
-     * If it exists, use `chroma_update_documents` to update it
-     * If it doesn't exist, use `chroma_add_documents` to add it
+     * Check if the document already exists by querying the collection with the file path as ID using `context_get_documents` or `context_query_documents`
+     * If it exists, use `context_update_documents` to update it
+     * If it doesn't exist, use `context_add_documents` to add it
      * Always include proper metadata as an array of objects with the structure: `[{'file_path': 'relative/path/to/file', 'type': 'ts4|adr|project-doc|feature|ui-intent', 'collection': 'target-collection-name'}]`
      * Use the file path (relative to project root) as the document ID
      * Avoid duplicated files and outdated or deleted files in the collection
@@ -695,7 +695,7 @@ When a user asks to implement a feature or work with `.feature` files:
 
 0. **Context Loading Phase (MANDATORY FIRST STEP)**:
    - **CRITICAL**: Before starting ANY feature analysis or implementation, you MUST load context from the Cliplin MCP server 'cliplin-context'
-   - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. chroma_query_documents) to load relevant context from ALL collections:
+   - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. context_query_documents) to load relevant context from ALL collections:
      * Query `business-and-architecture` collection to load ADRs and business documentation
      * Query `tech-specs` collection to load technical specifications and implementation rules
      * Query `features` collection to load related or dependent features
@@ -810,7 +810,7 @@ When a user asks to modify an existing feature:
 
 0. **Context Loading Phase (MANDATORY FIRST STEP)**:
    - **CRITICAL**: Before starting ANY feature modification analysis, you MUST load context from the Cliplin MCP server 'cliplin-context'
-   - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. chroma_query_documents) to load relevant context:
+   - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. context_query_documents) to load relevant context:
      * Query `features` collection to load the feature being modified and related features that might be affected
      * Query `business-and-architecture` collection to load business rules and ADRs that might impact the change
      * Query `tech-specs` collection to load technical constraints that must be considered

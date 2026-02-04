@@ -9,6 +9,26 @@ Feature: Cliplin Storage MCP
     And the project context store is initialized at the project data path
     And the MCP server configuration includes the Cliplin storage MCP server
 
+  # --- MCP tool naming (contract) ---
+  # All MCP tools MUST use the prefix "context_" and MUST NOT expose the underlying
+  # storage implementation (e.g. ChromaDB) in tool names. The contract is implementation-agnostic.
+  # Explicit tool names (source of truth for the storage MCP API):
+  #   Collections: context_list_collections, context_create_collection, context_get_collection_info,
+  #     context_get_collection_count, context_peek_collection, context_modify_collection,
+  #     context_delete_collection, context_fork_collection
+  #   Documents:   context_add_documents, context_query_documents, context_get_documents,
+  #     context_update_documents, context_delete_documents
+  #   Change detection: context_check_document_changed, context_list_changed_documents
+
+  @status:implemented
+  @changed:2025-02-04
+  Scenario: MCP tool names use context_ prefix and are implementation-agnostic
+    Given the storage MCP server is running and connected to the project context store
+    When I list the tools exposed by the storage MCP server
+    Then every tool name MUST use the prefix "context_" (e.g. context_list_collections, context_query_documents)
+    And no tool name MUST expose the underlying storage implementation (e.g. no "chroma_" or product-specific prefix)
+    And the contract is implementation-agnostic: callers use "context store" and "context_*" tools only
+
   @status:implemented
   @changed:2025-01-30
   Scenario: List all collections in the context store

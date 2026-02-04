@@ -15,8 +15,8 @@ from cliplin.utils.chromadb import get_context_store
 from cliplin.utils.fingerprint import get_fingerprint_store
 
 MCP_INSTRUCTIONS = """Cliplin context server: semantic search over project specs (ADRs, features, TS4, UI intent).
-Use chroma_query_documents to load relevant context before planning or coding. Collections: business-and-architecture, features, tech-specs, uisi.
-Use chroma_list_changed_documents or chroma_check_document_changed for change detection. Never proceed without loading context from this server."""
+Use context_query_documents to load relevant context before planning or coding. Collections: business-and-architecture, features, tech-specs, uisi.
+Use context_list_changed_documents or context_check_document_changed for change detection. Never proceed without loading context from this server."""
 
 mcp = FastMCP(
     "cliplin-context",
@@ -48,7 +48,7 @@ def _ensure_db() -> None:
 
 
 @mcp.tool()
-def chroma_list_collections(
+def context_list_collections(
     limit: Optional[int] = None,
     offset: Optional[int] = None,
 ) -> str:
@@ -59,7 +59,7 @@ def chroma_list_collections(
 
 
 @mcp.tool()
-def chroma_create_collection(
+def context_create_collection(
     collection_name: str,
     embedding_function_name: Optional[str] = None,
     metadata: Optional[Dict[str, Any]] = None,
@@ -74,7 +74,7 @@ def chroma_create_collection(
 
 
 @mcp.tool()
-def chroma_get_collection_info(collection_name: str) -> str:
+def context_get_collection_info(collection_name: str) -> str:
     """Get information about a collection (name, metadata, etc.)."""
     _ensure_db()
     info = _get_store().get_collection_info(collection_name)
@@ -82,7 +82,7 @@ def chroma_get_collection_info(collection_name: str) -> str:
 
 
 @mcp.tool()
-def chroma_get_collection_count(collection_name: str) -> str:
+def context_get_collection_count(collection_name: str) -> str:
     """Get the number of documents in a collection."""
     _ensure_db()
     count = _get_store().get_collection_count(collection_name)
@@ -90,7 +90,7 @@ def chroma_get_collection_count(collection_name: str) -> str:
 
 
 @mcp.tool()
-def chroma_peek_collection(collection_name: str, limit: int = 5) -> str:
+def context_peek_collection(collection_name: str, limit: int = 5) -> str:
     """Peek at documents in a collection. Returns up to `limit` documents (default 5)."""
     _ensure_db()
     out = _get_store().peek(collection_name, limit=limit)
@@ -98,7 +98,7 @@ def chroma_peek_collection(collection_name: str, limit: int = 5) -> str:
 
 
 @mcp.tool()
-def chroma_add_documents(
+def context_add_documents(
     collection_name: str,
     documents: List[str],
     ids: List[str],
@@ -120,7 +120,7 @@ def chroma_add_documents(
 
 
 @mcp.tool()
-def chroma_query_documents(
+def context_query_documents(
     collection_name: str,
     query_texts: List[str],
     n_results: int = 5,
@@ -138,7 +138,7 @@ def chroma_query_documents(
 
 
 @mcp.tool()
-def chroma_get_documents(
+def context_get_documents(
     collection_name: str,
     ids: Optional[List[str]] = None,
     where: Optional[Dict[str, Any]] = None,
@@ -157,7 +157,7 @@ def chroma_get_documents(
 
 
 @mcp.tool()
-def chroma_update_documents(
+def context_update_documents(
     collection_name: str,
     ids: List[str],
     documents: Optional[List[str]] = None,
@@ -179,7 +179,7 @@ def chroma_update_documents(
 
 
 @mcp.tool()
-def chroma_delete_documents(collection_name: str, ids: List[str]) -> str:
+def context_delete_documents(collection_name: str, ids: List[str]) -> str:
     """Delete documents from a collection by id."""
     _ensure_db()
     n = _get_store().delete_documents(collection_name, ids)
@@ -187,7 +187,7 @@ def chroma_delete_documents(collection_name: str, ids: List[str]) -> str:
 
 
 @mcp.tool()
-def chroma_modify_collection(
+def context_modify_collection(
     collection_name: str,
     new_name: Optional[str] = None,
     new_metadata: Optional[Dict[str, Any]] = None,
@@ -202,7 +202,7 @@ def chroma_modify_collection(
 
 
 @mcp.tool()
-def chroma_delete_collection(collection_name: str) -> str:
+def context_delete_collection(collection_name: str) -> str:
     """Delete a collection and all its documents."""
     _ensure_db()
     _get_store().delete_collection(collection_name)
@@ -210,7 +210,7 @@ def chroma_delete_collection(collection_name: str) -> str:
 
 
 @mcp.tool()
-def chroma_fork_collection(
+def context_fork_collection(
     collection_name: str,
     new_collection_name: str,
     metadata: Optional[Dict[str, Any]] = None,
@@ -225,14 +225,14 @@ def chroma_fork_collection(
 
 
 @mcp.tool()
-def chroma_check_document_changed(file_path: str) -> str:
+def context_check_document_changed(file_path: str) -> str:
     """Check if a document (by relative file path, e.g. docs/ts4/example.ts4) has changed since last index. Uses fingerprint store."""
     result = _get_fingerprint_store().has_changed(file_path)
     return json.dumps(result)
 
 
 @mcp.tool()
-def chroma_list_changed_documents(
+def context_list_changed_documents(
     collection_name: Optional[str] = None,
     directories: Optional[List[str]] = None,
 ) -> str:

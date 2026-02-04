@@ -40,7 +40,7 @@ rules:
     - The Cliplin MCP server MUST expose server instructions so that the host (e.g. Cursor, Claude Desktop) receives server info in the MCP handshake (initialize response)
     - When using FastMCP (or equivalent), the server MUST be constructed with the `instructions` parameter set to a non-empty string describing the server's purpose and how to use it (e.g. which tools to call, which collections exist)
     - Without instructions, some hosts send a GetInstructions action and log "No server info found" or treat the server as misconfigured; the server must always return both serverInfo and instructions in the initialize response
-    - Instructions should be short, actionable text (e.g. "Use chroma_query_documents to load context; collections: business-and-architecture, features, tech-specs, uisi")
+    - Instructions should be short, actionable text (e.g. "Use context_query_documents to load context; collections: business-and-architecture, features, tech-specs, uisi")
   - |
     Dependency direction:
     - Commands and MCP depend on utils; utils do not depend on commands or MCP

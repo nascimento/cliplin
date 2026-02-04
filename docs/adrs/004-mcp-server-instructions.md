@@ -34,7 +34,7 @@ Technical rules are prescribed in the TS4 (e.g. "MCP server must expose instruct
 
 ### Negative
 
-- Instructions must be kept in sync with the actual tools and collections; if they drift, the instructions become misleading. Mitigation: keep instructions short and generic (e.g. "Use chroma_query_documents; collections: …") and update them when adding or renaming collections or changing usage rules.
+- Instructions must be kept in sync with the actual tools and collections; if they drift, the instructions become misleading. Mitigation: keep instructions short and generic (e.g. "Use context_query_documents; collections: …") and update them when adding or renaming collections or changing usage rules.
 
 ## Lesson learned
 

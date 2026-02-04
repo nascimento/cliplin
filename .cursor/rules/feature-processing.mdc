@@ -10,7 +10,7 @@ When a user asks to implement a feature or work with `.feature` files:
 
 0. **Context Loading Phase (MANDATORY FIRST STEP)**:
    - **CRITICAL**: Before starting ANY feature analysis or implementation, you MUST load context from the Cliplin MCP server 'cliplin-context'
-   - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. chroma_query_documents) to load relevant context from ALL collections:
+   - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. context_query_documents) to load relevant context from ALL collections:
      * Query `business-and-architecture` collection to load ADRs and business documentation
      * Query `tech-specs` collection to load technical specifications and implementation rules
      * Query `features` collection to load related or dependent features
@@ -126,7 +126,7 @@ When a user asks to modify an existing feature:
 
 0. **Context Loading Phase (MANDATORY FIRST STEP)**:
    - **CRITICAL**: Before starting ANY feature modification analysis, you MUST load context from the Cliplin MCP server 'cliplin-context'
-   - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. chroma_query_documents) to load relevant context:
+   - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. context_query_documents) to load relevant context:
      * Query `features` collection to load the feature being modified and related features that might be affected
      * Query `business-and-architecture` collection to load business rules and ADRs that might impact the change
      * Query `tech-specs` collection to load technical constraints that must be considered
