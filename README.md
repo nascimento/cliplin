@@ -74,10 +74,10 @@ Cliplin organizes specifications into four complementary pillars, each with a pr
 ### 1. Initialize Your Project
 
 ```bash
-# Quick installation with uv
-uv tool install cliplin
+# Install Cliplin from GitHub (recommended)
+uv tool install git+https://github.com/Rodrigonavarro23/cliplin.git
 
-# Or one-time execution
+# One-time execution without installing
 uvx cliplin init --ai cursor
 ```
 
@@ -245,7 +245,7 @@ cliplin tool --list             # List all available tools
 ## Requirements
 
 - Python 3.10 or higher (Python 3.11 may have compatibility issues with the context store backend on Windows)
-- [uv](https://github.com/astral-sh/uv) (Astral UV) for installation
+- [uv](https://github.com/astral-sh/uv) (Astral UV) — recommended for installation from GitHub: `uv tool install git+https://github.com/Rodrigonavarro23/cliplin.git`
 - A compatible AI assistant (Cursor, Claude Desktop, etc.)
 
 ### Windows-Specific Requirements
@@ -315,35 +315,41 @@ Choose one of the installation methods below (same as other platforms).
 
 #### Installation Methods
 
-**Option 1: Install from PyPI (when available)**
-```bash
-uv tool install cliplin
-```
+**Recommended: Install from GitHub with uv**
 
-**Option 2: Install directly from GitHub repository**
+This is the default way to get Cliplin. It always installs the latest version from the repository.
+
 ```bash
 # Install from main branch
 uv tool install git+https://github.com/Rodrigonavarro23/cliplin.git
 
-# Or install from a specific branch
+# Install from a specific branch (optional)
 uv tool install git+https://github.com/Rodrigonavarro23/cliplin.git@main
 ```
 
-**Option 3: Install with pip from GitHub**
+**Alternative: Install from PyPI or local (when available)**
+
+Use `uv tool install cliplin` only when the package is published on PyPI or you want to run a local/dev build (e.g. after cloning and `uv pip install -e .`). For most users, prefer the GitHub command above.
+
 ```bash
+# From PyPI (when the package is published)
+uv tool install cliplin
+```
+
+**Other options**
+
+```bash
+# With pip from GitHub
 pip install git+https://github.com/Rodrigonavarro23/cliplin.git
 ```
 
-**Option 4: Development installation**
+**Development / local debugging**
+
 ```bash
-# Clone the repository
 git clone https://github.com/Rodrigonavarro23/cliplin.git
 cd cliplin
-
-# Install in development mode
 uv pip install -e .
-# or
-pip install -e .
+# or: pip install -e .
 ```
 
 #### Windows Installation Troubleshooting
