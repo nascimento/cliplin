@@ -81,7 +81,8 @@ Feature: Cliplin CLI Tool
     And the CLI should display a success message indicating project initialization with Claude Desktop is complete
 
   @status:implemented
-  @changed:2024-01-15
+  @changed:2025-02-16
+  @reason:Config file default location moved to project root
   Scenario: Validate project structure after initialization
     Given I have initialized a Cliplin project using `cliplin init --ai cursor`
     When I run `cliplin validate` or the validation runs automatically after init
@@ -98,7 +99,7 @@ Feature: Cliplin CLI Tool
       | features |
       | tech-specs |
       | uisi |
-    And the CLI should verify that configuration file exists at `.cliplin/config.yaml`
+    And the CLI should verify that configuration file exists at project root `config.yaml`
     And the CLI should verify that MCP server configuration files exist for the specified AI tool
     And if the AI tool is "cursor", the CLI should verify that `.cursor/mcp.json` exists
     And if the AI tool is "claude-desktop", the CLI should verify that `.mcp.json` exists at the project root
@@ -166,12 +167,13 @@ Feature: Cliplin CLI Tool
     And if Cliplin is not initialized, the CLI should proceed with initialization normally
 
   @status:implemented
-  @changed:2024-01-15
+  @changed:2025-02-16
+  @reason:Config file default location moved to project root
   Scenario: Create configuration files during initialization
     Given I have the Cliplin CLI tool installed
     And I am in an empty directory or a new project directory
     When I run `cliplin init --ai cursor`
-    Then the CLI should create `.cliplin/config.yaml` with proper configuration
+    Then the CLI should create `config.yaml` at project root with proper configuration
     And the CLI should create `README.md` if it doesn't exist
     And the CLI should include the AI tool configuration in the config file
     And the CLI should display success messages for each created file

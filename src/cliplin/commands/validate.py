@@ -92,7 +92,7 @@ def validate_command() -> None:
     
     # Check for configuration files and MCP file for configured AI tool
     console.print("\n[bold]Checking configuration files...[/bold]")
-    config_file = project_root / ".cliplin" / "config.yaml"
+    config_file = project_root / "config.yaml"
     if config_file.exists():
         console.print(f"  [green]✓[/green] Config file exists")
         ai_tool: Optional[str] = _get_ai_tool_from_config(config_file)
@@ -131,7 +131,7 @@ def validate_command() -> None:
 
 
 def _get_ai_tool_from_config(config_path: Path) -> Optional[str]:
-    """Read ai_tool from .cliplin/config.yaml if present."""
+    """Read ai_tool from config.yaml at project root if present."""
     if not config_path.exists():
         return None
     try:

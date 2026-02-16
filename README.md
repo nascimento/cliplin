@@ -85,6 +85,7 @@ Cliplin automatically creates the directory structure and configures everything 
 
 ```
 .
+├── config.yaml        # Cliplin config (ai_tool, etc.)
 ├── docs/
 │   ├── adrs/          # Architecture Decision Records
 │   ├── business/      # Business documentation
@@ -92,7 +93,6 @@ Cliplin automatically creates the directory structure and configures everything 
 │   ├── ts4/           # Technical specifications
 │   └── ui-intent/      # UI specifications
 └── .cliplin/
-    ├── config.yaml
     └── data/context/   # Context store (project context store)
 ```
 
