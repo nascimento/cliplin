@@ -137,7 +137,7 @@ annotations:
 ### Usage
 
 - UI Intent files are located in `docs/ui-intent/` directory
-- They are indexed in ChromaDB collection `uisi`
+- They are indexed in the context store collection `uisi`
 - AI assistants should query `uisi` collection when implementing user interfaces
 - UI Intent allows AI to generate UI code without guessing user experience decisions
 
@@ -150,6 +150,6 @@ annotations:
 - Optimized for AI context retrieval
 
 ### Notes
-- This ADR should be indexed in ChromaDB collection `business-and-architecture`
+- This ADR should be indexed in the context store collection `business-and-architecture`
 - When creating new UI Intent files, follow the schema structure described here
 - UI Intent focuses on intent, not visual design details

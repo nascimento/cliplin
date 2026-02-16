@@ -102,7 +102,7 @@ Feature: Cliplin CLI Tool
       | features |
       | tech-specs |
       | uisi |
-    And the CLI should verify that configuration file exists at project root `config.yaml`
+    And the CLI should verify that configuration file exists at project root `cliplin.yaml`
     And the CLI should verify that MCP server configuration files exist for the specified AI tool
     And if the AI tool is "cursor", the CLI should verify that `.cursor/mcp.json` exists
     And if the AI tool is "claude-desktop", the CLI should verify that `.mcp.json` exists at the project root
@@ -176,7 +176,7 @@ Feature: Cliplin CLI Tool
     Given I have the Cliplin CLI tool installed
     And I am in an empty directory or a new project directory
     When I run `cliplin init --ai cursor`
-    Then the CLI should create `config.yaml` at project root with proper configuration
+    Then the CLI should create `cliplin.yaml` at project root with proper configuration
     And the CLI should create `README.md` if it doesn't exist
     And the CLI should include the AI tool configuration in the config file
     And the CLI should display success messages for each created file

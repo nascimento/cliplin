@@ -56,7 +56,7 @@ code_refs:  # Optional
 ### Usage
 
 - TS4 files are located in `docs/ts4/` directory
-- They are indexed in ChromaDB collection `tech-specs`
+- They are indexed in the context store collection `tech-specs`
 - AI assistants should query `tech-specs` collection before implementation to understand technical constraints
 - TS4 files complement ADRs: ADRs explain *why*, TS4 files define *how*
 
@@ -69,5 +69,5 @@ code_refs:  # Optional
 - Supports incremental documentation
 
 ### Notes
-- This ADR should be indexed in ChromaDB collection `business-and-architecture`
+- This ADR should be indexed in the context store collection `business-and-architecture`
 - When creating new TS4 files, follow the structure and naming conventions described here

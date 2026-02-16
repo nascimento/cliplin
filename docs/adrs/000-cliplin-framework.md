@@ -90,9 +90,9 @@ Every output must be traceable back to a specification.
 - Predictable AI behavior based on specifications
 - Clear separation of concerns across specification types
 - Versionable and maintainable specifications
-- All context available through ChromaDB indexing
+- All context available through the Cliplin MCP (context store) indexing
 
 ### Notes
-- This ADR should be indexed in ChromaDB collection `business-and-architecture`
+- This ADR should be indexed in the context store collection `business-and-architecture`
 - AI assistants should query this ADR and related context files before starting any work
 - All specifications must be kept up to date and properly indexed

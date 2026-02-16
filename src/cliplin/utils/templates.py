@@ -27,8 +27,8 @@ AI_TOOL_CONFIGS: Dict[str, Dict[str, Optional[str]]] = {
 
 
 def create_cliplin_config(target_dir: Path, ai_tool: Optional[str] = None) -> None:
-    """Create or update config.yaml at project root with optional ai_tool for validate to check MCP file."""
-    config_path = target_dir / "config.yaml"
+    """Create or update cliplin.yaml at project root with optional ai_tool for validate to check MCP file."""
+    config_path = target_dir / "cliplin.yaml"
 
     config: Dict[str, Optional[str]] = {}
     if config_path.exists():
@@ -47,9 +47,9 @@ def create_cliplin_config(target_dir: Path, ai_tool: Optional[str] = None) -> No
         yaml.safe_dump(config, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
 
     if ai_tool is not None:
-        console.print(f"  [green]✓[/green] Created/updated config.yaml (ai_tool: {ai_tool})")
+        console.print(f"  [green]✓[/green] Created/updated cliplin.yaml (ai_tool: {ai_tool})")
     else:
-        console.print(f"  [green]✓[/green] Created config.yaml")
+        console.print(f"  [green]✓[/green] Created cliplin.yaml")
 
 
 def create_readme_file(target_dir: Path) -> None:

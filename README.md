@@ -85,7 +85,7 @@ Cliplin automatically creates the directory structure and configures everything 
 
 ```
 .
-├── config.yaml        # Cliplin config (ai_tool, etc.)
+├── cliplin.yaml       # Cliplin config (ai_tool, etc.)
 ├── docs/
 │   ├── adrs/          # Architecture Decision Records
 │   ├── business/      # Business documentation
