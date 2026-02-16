@@ -1,7 +1,8 @@
 """ChromaDB utilities for Cliplin. Concrete implementation of ContextStore protocol."""
 
+import fnmatch
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import chromadb
 from chromadb.config import Settings
@@ -36,6 +37,22 @@ COLLECTION_MAPPINGS = {
 }
 
 REQUIRED_COLLECTIONS = list(COLLECTION_MAPPINGS.keys())
+
+# Path segments under a knowledge package root that map to context collections.
+# Each tuple: (path_segment under pkg, file_pattern, collection_name, type).
+# Used for .cliplin/knowledge/<pkg>/... (structure-agnostic: any .md under adrs/docs/adrs, etc.)
+KNOWLEDGE_PATH_MAPPINGS: List[Tuple[str, str, str, str]] = [
+    ("docs/adrs", "*.md", "business-and-architecture", "adr"),
+    ("adrs", "*.md", "business-and-architecture", "adr"),
+    ("docs/business", "*.md", "business-and-architecture", "project-doc"),
+    ("business", "*.md", "business-and-architecture", "project-doc"),
+    ("docs/features", "*.feature", "features", "feature"),
+    ("features", "*.feature", "features", "feature"),
+    ("docs/ts4", "*.ts4", "tech-specs", "ts4"),
+    ("ts4", "*.ts4", "tech-specs", "ts4"),
+    ("docs/ui-intent", "*.yaml", "uisi", "ui-intent"),
+    ("ui-intent", "*.yaml", "uisi", "ui-intent"),
+]
 
 
 def get_chromadb_path(project_root: Path) -> Path:
@@ -86,31 +103,90 @@ def verify_collections(client: chromadb.Client) -> List[str]:
     return missing
 
 
+def _path_under_knowledge_package(relative_path_str: str) -> Optional[str]:
+    """If path is under .cliplin/knowledge/<pkg_dir>/..., return path under package (e.g. docs/adrs/001.md)."""
+    normalized = relative_path_str.replace("\\", "/")
+    if not normalized.startswith(".cliplin/knowledge/"):
+        return None
+    parts = normalized.split("/")
+    if len(parts) < 4:  # .cliplin, knowledge, <pkg_dir>, ...
+        return None
+    return "/".join(parts[3:])
+
+
 def get_collection_for_file(file_path: Path, project_root: Path) -> Optional[str]:
     """Determine the ChromaDB collection for a given file path."""
     relative_path = file_path.relative_to(project_root)
-    
+    rel_str = str(relative_path).replace("\\", "/")
+    name = file_path.name
+
+    # Check knowledge package paths first
+    path_under_pkg = _path_under_knowledge_package(rel_str)
+    if path_under_pkg is not None:
+        for path_seg, file_pattern, collection_name, _ in KNOWLEDGE_PATH_MAPPINGS:
+            if path_under_pkg == path_seg or path_under_pkg.startswith(path_seg + "/"):
+                if fnmatch.fnmatch(name, file_pattern):
+                    return collection_name
+        return None
+
     for collection_name, mapping in COLLECTION_MAPPINGS.items():
         for directory in mapping["directories"]:
-            if str(relative_path).startswith(directory):
-                # Check file pattern
+            if rel_str.startswith(directory.replace("\\", "/")):
                 if file_path.match(mapping["file_pattern"]):
                     return collection_name
-    
     return None
 
 
 def get_file_type(file_path: Path, project_root: Path) -> Optional[str]:
     """Get the file type based on path and collection mapping."""
     relative_path = file_path.relative_to(project_root)
-    
+    rel_str = str(relative_path).replace("\\", "/")
+    name = file_path.name
+
+    path_under_pkg = _path_under_knowledge_package(rel_str)
+    if path_under_pkg is not None:
+        for path_seg, file_pattern, _, type_name in KNOWLEDGE_PATH_MAPPINGS:
+            if path_under_pkg == path_seg or path_under_pkg.startswith(path_seg + "/"):
+                if fnmatch.fnmatch(name, file_pattern):
+                    return type_name
+        return None
+
     for collection_name, mapping in COLLECTION_MAPPINGS.items():
         for directory in mapping["directories"]:
-            if str(relative_path).startswith(directory):
+            if rel_str.startswith(directory.replace("\\", "/")):
                 if file_path.match(mapping["file_pattern"]):
                     return mapping["type"]
-    
     return None
+
+
+def get_document_ids_by_file_path_prefix(
+    store: ContextStore, prefix: str
+) -> Dict[str, List[str]]:
+    """
+    Return document IDs in each collection whose file_path metadata starts with prefix.
+    Used when removing a knowledge package to delete its documents from the context store.
+    """
+    result: Dict[str, List[str]] = {}
+    for collection_name in REQUIRED_COLLECTIONS:
+        try:
+            data = store.get_documents(
+                collection_name,
+                limit=10000,
+                include=["metadatas"],
+            )
+        except Exception:
+            continue
+        ids = data.get("ids") or []
+        metadatas = data.get("metadatas") or []
+        matching = []
+        for i, doc_id in enumerate(ids):
+            meta = metadatas[i] if i < len(metadatas) else {}
+            fp = meta.get("file_path") or ""
+            if fp.startswith(prefix):
+                matching.append(doc_id)
+        if matching:
+            result[collection_name] = matching
+    return result
 
 
 # --- Concrete implementation of ContextStore (low coupling) ---

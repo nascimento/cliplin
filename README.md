@@ -171,7 +171,21 @@ cliplin tool ui-intent
 
 **Note:** Tools are part of the Cliplin package installation, not your project. They are provided by Cliplin and available in any project where Cliplin is installed.
 
-### 6. Work with AI
+### 6. Manage Knowledge Packages (optional)
+
+You can install **knowledge packages**: external repos with ADRs, TS4, features, etc. They are installed under `.cliplin/knowledge/` and **indexed in the same context store** as your project specs.
+
+```bash
+cliplin knowledge list
+cliplin knowledge add aws github:org/cliplin-knowledge main
+cliplin knowledge show aws
+cliplin knowledge update aws
+cliplin knowledge remove aws
+```
+
+Packages are declared in `cliplin.yaml` under the `knowledge` key. In **multi-package repos** (one repo with several top-level folders like `aws/`, `commons/`), the package **name** selects which folder to install. See **[docs/business/knowledge-packages.md](docs/business/knowledge-packages.md)** for full usage, config format, and conventions.
+
+### 7. Work with AI
 
 With Cliplin configured, you can tell your AI assistant:
 
@@ -235,6 +249,13 @@ cliplin feature apply docs/features/my-feature.feature
 # Generate ADR prompt from repository
 cliplin adr generate ./vendor/my-proprietary-sdk        # Local repository
 cliplin adr generate https://github.com/company/sdk     # Remote repository
+
+# Knowledge packages (optional)
+cliplin knowledge list                    # List packages
+cliplin knowledge add <name> <source> <v>  # Add and index
+cliplin knowledge show <name>             # Show details
+cliplin knowledge update <name>           # Update and reindex
+cliplin knowledge remove <name>           # Remove and purge from context store
 
 # Open tools (SPAs)
 cliplin tool ui-intent          # Open a specific tool
@@ -427,4 +448,7 @@ Contributions, issues, and feature requests are welcome. Help us make Spec-Drive
 
 ---
 
-**Questions?** Open an issue or check the documentation at [docs/business/framework.md](docs/business/framework.md)
+**Questions?** Open an issue or check the documentation:
+
+- Framework and pillars: [docs/business/framework.md](docs/business/framework.md)
+- Knowledge packages: [docs/business/knowledge-packages.md](docs/business/knowledge-packages.md)

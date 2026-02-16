@@ -12,6 +12,7 @@ from rich.table import Table
 from cliplin.protocols import ContextStore, FingerprintStore
 from cliplin.utils.chromadb import (
     COLLECTION_MAPPINGS,
+    KNOWLEDGE_PATH_MAPPINGS,
     get_collection_for_file,
     get_context_store,
     get_file_type,
@@ -180,27 +181,51 @@ def get_files_to_reindex(
                 files.extend(dir_path.rglob(dir_pattern[1]))
     
     elif directory:
-        # Files in specific directory
+        # Files in specific directory (project docs or .cliplin/knowledge/<pkg>)
         dir_path = project_root / directory
         if not dir_path.exists():
             raise FileNotFoundError(f"Directory not found: {directory}")
-        
-        # Determine file pattern based on directory
-        for collection_name, mapping in COLLECTION_MAPPINGS.items():
-            if directory in mapping["directories"]:
-                files.extend(dir_path.rglob(mapping["file_pattern"]))
-                break
+        dir_norm = directory.replace("\\", "/")
+        # Knowledge package directory (or root): scan with KNOWLEDGE_PATH_MAPPINGS
+        if dir_norm == ".cliplin/knowledge" or dir_norm.startswith(".cliplin/knowledge/"):
+            if dir_norm == ".cliplin/knowledge":
+                # Scan all packages under knowledge root
+                for pkg_dir in dir_path.iterdir():
+                    if pkg_dir.is_dir():
+                        for path_seg, file_pattern, _, _ in KNOWLEDGE_PATH_MAPPINGS:
+                            seg_path = pkg_dir / path_seg
+                            if seg_path.exists():
+                                files.extend(seg_path.rglob(file_pattern))
+            else:
+                # Single package dir: .cliplin/knowledge/<pkg>
+                for path_seg, file_pattern, _, _ in KNOWLEDGE_PATH_MAPPINGS:
+                    seg_path = dir_path / path_seg
+                    if seg_path.exists():
+                        files.extend(seg_path.rglob(file_pattern))
         else:
-            raise ValueError(f"Directory is not a valid context directory: {directory}")
+            for collection_name, mapping in COLLECTION_MAPPINGS.items():
+                if directory in mapping["directories"]:
+                    files.extend(dir_path.rglob(mapping["file_pattern"]))
+                    break
+            else:
+                raise ValueError(f"Directory is not a valid context directory: {directory}")
     
     else:
-        # All context files
+        # All context files: project docs + knowledge packages
         for collection_name, mapping in COLLECTION_MAPPINGS.items():
             for dir_name in mapping["directories"]:
                 dir_path = project_root / dir_name
                 if dir_path.exists():
                     files.extend(dir_path.rglob(mapping["file_pattern"]))
-    
+        # .cliplin/knowledge/<pkg>/... (structure-agnostic per KNOWLEDGE_PATH_MAPPINGS)
+        knowledge_root = project_root / ".cliplin" / "knowledge"
+        if knowledge_root.exists():
+            for pkg_dir in knowledge_root.iterdir():
+                if pkg_dir.is_dir():
+                    for path_seg, file_pattern, _, _ in KNOWLEDGE_PATH_MAPPINGS:
+                        seg_path = pkg_dir / path_seg
+                        if seg_path.exists():
+                            files.extend(seg_path.rglob(file_pattern))
     return sorted(set(files))
 
 
@@ -213,7 +238,7 @@ def reindex_file(
 ) -> str:
     """Reindex a single file. Returns 'added', 'updated', or 'skipped' (unchanged)."""
     relative_path = file_path.relative_to(project_root)
-    file_id = str(relative_path)
+    file_id = relative_path.as_posix()
 
     collection_name = get_collection_for_file(file_path, project_root)
     if not collection_name:
@@ -272,7 +297,7 @@ def display_dry_run_report(
 
     for file_path in files:
         relative_path = file_path.relative_to(project_root)
-        file_id = str(relative_path)
+        file_id = relative_path.as_posix()
 
         collection_name = get_collection_for_file(file_path, project_root)
         if not collection_name:

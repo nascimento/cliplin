@@ -1,5 +1,7 @@
 """Claude Desktop integration: config and rules under .mcp.json and .claude/."""
 
+import os
+import shutil
 from pathlib import Path
 
 from rich.console import Console
@@ -58,3 +60,31 @@ class ClaudeDesktopIntegration:
             templates.get_claude_desktop_claude_md_content(), encoding="utf-8"
         )
         console.print(f"  [green]✓[/green] Created {claude_md_path}")
+
+    def link_knowledge_skills(self, project_root: Path, package_path: Path) -> None:
+        """Create hard links from package_path/skills to .claude/skills/<pkg_name> so Claude sees them."""
+        skills_src = package_path / "skills"
+        if not skills_src.is_dir():
+            return
+        pkg_name = package_path.name
+        skills_dst_root = project_root / ".claude" / "skills" / pkg_name
+        skills_dst_root.mkdir(parents=True, exist_ok=True)
+        for src_file in skills_src.rglob("*"):
+            if not src_file.is_file():
+                continue
+            rel = src_file.relative_to(skills_src)
+            dst_file = skills_dst_root / rel
+            dst_file.parent.mkdir(parents=True, exist_ok=True)
+            if dst_file.exists():
+                dst_file.unlink()
+            try:
+                os.link(src_file, dst_file)
+            except OSError:
+                pass  # e.g. cross-filesystem: fall back to copy or skip
+
+    def unlink_knowledge_skills(self, project_root: Path, package_path: Path) -> None:
+        """Remove .claude/skills/<pkg_name> created by link_knowledge_skills."""
+        pkg_name = package_path.name
+        skills_dst = project_root / ".claude" / "skills" / pkg_name
+        if skills_dst.exists():
+            shutil.rmtree(skills_dst)

@@ -7,12 +7,12 @@ rules:
   - |
     Module layout:
     - `src/cliplin/cli.py`: CLI entry point and command registration only; no business logic for context or storage
-    - `src/cliplin/commands/`: One module per CLI command (init, validate, reindex, feature, adr, tool); commands orchestrate and call shared utils
+    - `src/cliplin/commands/`: One module per CLI command (init, validate, reindex, feature, adr, tool, knowledge); commands orchestrate and call shared utils
     - `src/cliplin/utils/`: Shared functionality used by both CLI and MCP: chromadb (client, collections, document ops), templates, ai_host_integrations (one class per AI host, see docs/ts4/ai-host-integration-handler-pattern.ts4), tools; add fingerprint/change-detection here so it is reusable
     - MCP server: When the storage MCP is implemented, it must call the same utils (e.g. chromadb, fingerprint store) as the CLI; no duplicate implementation of "list collections", "add document", "query", "list changed documents", etc.
   - |
     Context locations as single source of truth:
-    - Context directories and collection mappings (docs/adrs, docs/business, docs/features, docs/ts4, docs/ui-intent → business-and-architecture, features, tech-specs, uisi) must be defined in one place (e.g. COLLECTION_MAPPINGS in utils/chromadb.py or a dedicated config module)
+    - Context directories and collection mappings (docs/adrs, docs/business, docs/features, docs/ts4, docs/ui-intent → business-and-architecture, features, tech-specs, uisi; plus .cliplin/knowledge/** per docs/ts4/knowledge-reindex-context.ts4) must be defined in one place (e.g. COLLECTION_MAPPINGS in utils/chromadb.py or a dedicated config module)
     - CLI commands and MCP tools must resolve "which files belong to which collection" and "which directories to scan" from this single definition
     - Adding a new context type (e.g. new directory or collection) requires changing only this mapping and any docs; CLI and MCP then both see the new locations
   - |
@@ -22,7 +22,7 @@ rules:
     - Do not implement change detection twice (once in MCP, once in CLI); one implementation, two consumers
   - |
     Future CLI command for validating changes:
-    - A future feature may add a CLI command (e.g. `cliplin changes` or `cliplin reindex --dry-run` enhanced) that: scans all context locations (docs/adrs, docs/business, docs/features, docs/ts4, docs/ui-intent), evaluates which files are new or changed using the fingerprint store, and reports a list of files that need reindexing without performing the reindex
+    - A future feature may add a CLI command (e.g. `cliplin changes` or `cliplin reindex --dry-run` enhanced) that: scans all context locations (docs/..., .cliplin/knowledge/...), evaluates which files are new or changed using the fingerprint store, and reports a list of files that need reindexing without performing the reindex
     - This command must use the same methods as the MCP: same "list changed documents" function, same collection/directory mapping, same fingerprint store path and format
     - Output may be human-readable (table or list) and/or machine-readable (e.g. JSON lines) for scripting; exit code 0 when there are no changes, non-zero when there are changes (or the inverse, as documented)
   - |
@@ -63,3 +63,6 @@ code_refs:
   - "docs/adrs/002-chromadb-rag-context-base.md"
   - "docs/adrs/003-incremental-context-reindexing.md"
   - "docs/adrs/004-mcp-server-instructions.md"
+  - "docs/adrs/005-knowledge-packages.md"
+  - "docs/ts4/knowledge-packages.ts4"
+  - "docs/ts4/knowledge-reindex-context.ts4"

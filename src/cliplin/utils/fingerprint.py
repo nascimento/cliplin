@@ -43,6 +43,20 @@ def save_fingerprint_store(
     path.write_text(json.dumps(store, indent=2), encoding=ENCODING)
 
 
+def remove_fingerprints_by_prefix(project_root: Path, prefix: str) -> int:
+    """
+    Remove all fingerprint entries whose key (file_path) starts with prefix.
+    Returns the number of entries removed. Used when removing a knowledge package.
+    """
+    store = load_fingerprint_store(project_root)
+    to_remove = [k for k in store if k.startswith(prefix)]
+    for k in to_remove:
+        del store[k]
+    if to_remove:
+        save_fingerprint_store(project_root, store)
+    return len(to_remove)
+
+
 def update_fingerprint(
     project_root: Path,
     file_path: str,

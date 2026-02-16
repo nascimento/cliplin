@@ -18,6 +18,9 @@ rules:
     - When documenting or generating "how to use with Claude Desktop", mention: (1) load instructions.md at conversation start, (2) optional: create a Skill from the `.claude` directory for automatic rule application
     - Any new Claude-specific capability (e.g. Skill packaging, extra rule files) must be documented in this TS4 and kept in sync with what `cliplin init --ai-tool claude-desktop` produces
   - |
+    Knowledge packages — Skills from .cliplin/knowledge (MUST when supported):
+    - When a knowledge package is installed via `cliplin knowledge add` and the package contains a skills directory (or host-equivalent), the Claude Desktop integration MAY expose those skills via hard links (or equivalent) under `.claude/skills` so they appear as installed to Claude Desktop. On `cliplin knowledge remove`, those links MUST be removed. If the integration does not implement this, it performs no action for skills; the rest of the knowledge feature (context store, reindex) still applies. See docs/ts4/knowledge-reindex-context.ts4 and docs/adrs/005-knowledge-packages.md.
+  - |
     When changing Claude Desktop-only behavior:
     - Changes to Claude rules (e.g. new file in .claude/rules/) or to instructions/claude.md content must stay consistent with docs/ts4/ai-host-integration.ts4 for the shared MCP command (same command/args as other hosts)
     - If adding Claude-specific templates (e.g. Skill manifest, new rule), document the path and purpose in this TS4
@@ -31,4 +34,6 @@ code_refs:
   - "docs/ts4/ai-host-integration.ts4"
   - "docs/ts4/system-modules.ts4"
   - "docs/adrs/004-mcp-server-instructions.md"
+  - "docs/ts4/knowledge-reindex-context.ts4"
+  - "docs/adrs/005-knowledge-packages.md"
   - ".claude/"

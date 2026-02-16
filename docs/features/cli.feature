@@ -198,7 +198,7 @@ Feature: Cliplin CLI Tool
     Given I have the Cliplin CLI tool installed
     When I run `cliplin --help`
     Then the CLI should display usage information
-    And the CLI should list all available commands (init, validate, reindex, feature apply, etc.)
+    And the CLI should list all available commands (init, validate, reindex, feature apply, knowledge, etc.)
     And the CLI should show command options and arguments
     And the CLI should display examples of command usage
     And the CLI should show the `reindex` command with its options:
