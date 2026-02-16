@@ -160,6 +160,16 @@ These tags allow commands like:
 
 To be executed autonomously and safely.
 
+### Feature-first flow: spec before code
+
+For Cliplin to work correctly, **the feature file must always be the source of truth**. The operational flow is:
+
+1. **On any user change or request** (new behavior, fix, refactor, or enhancement), the **first** thing to do is consider whether the feature spec needs to change. If it does, **update the relevant `.feature` file first** — before changing any other file (code, TS4, ADRs, etc.).
+2. **Then**, based on the (updated or existing) specs, perform the refactors or new code needed. All implementation must **satisfy the specs**; the spec drives what is built.
+3. If the requested scope has no feature yet, **create or update the feature file first**, then implement to fulfill it.
+
+Spec first, then code. Every change traces back to a specification.
+
 ---
 
 ## 6. Why Cliplin Works in Enterprise Environments

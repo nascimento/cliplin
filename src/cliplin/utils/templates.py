@@ -16,12 +16,14 @@ AI_TOOL_CONFIGS: Dict[str, Dict[str, Optional[str]]] = {
         "config_file": ".cursor/rules/context.mdc",
         "feature_processing_file": ".cursor/rules/feature-processing.mdc",
         "context_protocol_loading_file": ".cursor/rules/context-protocol-loading.mdc",
+        "feature_first_flow_file": ".cursor/rules/feature-first-flow.mdc",
     },
     "claude-desktop": {
         "rules_dir": ".claude/rules",
         "config_file": ".mcp.json",
         "feature_processing_file": ".claude/rules/feature-processing.md",
         "context_protocol_loading_file": ".claude/rules/context-protocol-loading.md",
+        "feature_first_flow_file": ".claude/rules/feature-first-flow.md",
     },
 }
 
@@ -480,6 +482,13 @@ def create_ai_tool_config(target_dir: Path, ai_tool: str) -> None:
         protocol_file.write_text(protocol_content, encoding="utf-8")
         console.print(f"  [green]✓[/green] Created {config['context_protocol_loading_file']}")
     
+    # Create feature-first-flow.mdc for Cursor
+    if ai_tool == "cursor" and config.get("feature_first_flow_file"):
+        flow_file = target_dir / config["feature_first_flow_file"]
+        flow_content = get_feature_first_flow_content()
+        flow_file.write_text(flow_content, encoding="utf-8")
+        console.print(f"  [green]✓[/green] Created {config['feature_first_flow_file']}")
+    
     # Create feature-processing.md for Claude Desktop
     if ai_tool == "claude-desktop" and config.get("feature_processing_file"):
         feature_file = target_dir / config["feature_processing_file"]
@@ -493,6 +502,13 @@ def create_ai_tool_config(target_dir: Path, ai_tool: str) -> None:
         protocol_content = get_cursor_context_protocol_loading_content()
         protocol_file.write_text(protocol_content, encoding="utf-8")
         console.print(f"  [green]✓[/green] Created {config['context_protocol_loading_file']}")
+    
+    # Create feature-first-flow.md for Claude Desktop
+    if ai_tool == "claude-desktop" and config.get("feature_first_flow_file"):
+        flow_file = target_dir / config["feature_first_flow_file"]
+        flow_content = get_feature_first_flow_content()
+        flow_file.write_text(flow_content, encoding="utf-8")
+        console.print(f"  [green]✓[/green] Created {config['feature_first_flow_file']}")
     
     # Create context.md for Claude Desktop in .claude/rules (similar to context.mdc for Cursor)
     if ai_tool == "claude-desktop":
@@ -676,6 +692,37 @@ When any context file is created or modified, you MUST:
    - The CLI ensures proper metadata, handles duplicates, and maintains consistency
    - Always ask for user confirmation before running reindex commands (unless in automated workflow)
    - Use `cliplin reindex --dry-run` first to show what would be indexed
+"""
+
+
+def get_feature_first_flow_content() -> str:
+    """Get the content for feature-first-flow rule (Cursor .mdc and Claude .md). Same content for both hosts."""
+    return """---
+alwaysApply: true
+---
+
+## Feature-first flow: spec before code
+
+**CRITICAL**: For Cliplin to work correctly, **the feature file is always the source of truth**. On any user change or request you MUST follow this order:
+
+### 1. Consider the feature spec first
+
+- **Before** modifying code, TS4, ADRs, or any other file, ask: does this change or request require an update to a feature spec?
+- If **yes** or **unclear**: **suggest** updating (or creating) the relevant `.feature` file in `docs/features/` first. Propose the spec changes and get user agreement if needed; then update the feature file **before** touching any other file.
+- If **no** (e.g. pure refactor that does not change behavior, or task explicitly outside feature scope): you may proceed without changing a feature file, but any new or changed behavior must still be traceable to a spec.
+
+### 2. Then implement to fulfill the spec
+
+- **After** the feature spec is correct (updated or confirmed), perform refactors or write new code **only to satisfy the specs**. The spec drives what is built; code does not drive the spec.
+- If no feature existed for the scope: creating/updating the `.feature` file was the first step; implementation follows from it.
+
+### Summary
+
+- **Spec first, then code.** Never change code first and leave the feature file out of date or missing.
+- **Suggest feature spec changes first** whenever the user's request implies new or changed behavior that should be specified.
+- Every change must be traceable to a specification; the feature file is the primary source of truth for *what* the system does.
+
+See also: `docs/business/framework.md` (section "Feature-first flow"), `docs/adrs/000-cliplin-framework.md` ("Operational flow: feature-first").
 """
 
 
@@ -1079,6 +1126,7 @@ This protocol is **MANDATORY** and must be followed before:
 def get_claude_desktop_instructions_content() -> str:
     """Get the consolidated instructions content for Claude Desktop."""
     context_content = get_cursor_context_content()
+    feature_first_flow_content = get_feature_first_flow_content()
     feature_content = get_cursor_feature_processing_content()
     protocol_content = get_cursor_context_protocol_loading_content()
     
@@ -1096,6 +1144,10 @@ This file contains all the rules and protocols that Claude should follow when wo
 ---
 
 {context_content}
+
+---
+
+{feature_first_flow_content}
 
 ---
 
@@ -1118,6 +1170,7 @@ This directory contains rules and instructions for using Claude Desktop with thi
 - **`.mcp.json`** (at project root): MCP server configuration for Cliplin context access
 - **`instructions.md`**: Consolidated instructions file with all project rules (LOAD THIS FIRST)
 - **`rules/context.md`**: Context indexing rules and context store collection mappings
+- **`rules/feature-first-flow.md`**: Feature-first flow (spec before code); feature file as source of truth
 - **`rules/feature-processing.md`**: Feature file processing and implementation rules
 - **`rules/context-protocol-loading.md`**: Context loading protocol rules
 

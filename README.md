@@ -179,10 +179,11 @@ With Cliplin configured, you can tell your AI assistant:
 
 And the AI will:
 1. ✅ Automatically load context from the Cliplin MCP server (context store)
-2. ✅ Read the feature file and related specifications
-3. ✅ Apply technical rules defined in TS4
-4. ✅ Respect architectural decisions in ADRs
-5. ✅ Generate code aligned with your specifications
+2. ✅ Consider or update the feature spec first if the request implies new or changed behavior (feature-first flow)
+3. ✅ Read the feature file and related specifications
+4. ✅ Apply technical rules defined in TS4
+5. ✅ Respect architectural decisions in ADRs
+6. ✅ Generate code aligned with your specifications
 
 ---
 

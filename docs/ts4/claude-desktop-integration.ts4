@@ -7,7 +7,7 @@ rules:
   - |
     Config and paths (Claude Desktop-only):
     - **MCP config**: `.mcp.json` at project root (not inside .claude); key `mcpServers["cliplin-context"]`
-    - **Rules**: `.claude/rules/` — e.g. context.md, feature-processing.md, context-protocol-loading.md
+    - **Rules**: `.claude/rules/` — e.g. context.md, feature-first-flow.md, feature-processing.md, context-protocol-loading.md
     - **Instructions**: `.claude/instructions.md` (consolidated rules); `.claude/claude.md` (directory README for users)
     - **Template generator**: `create_claude_desktop_mcp_config(target_dir)` in `src/cliplin/utils/templates.py` writes `.mcp.json` at project root
     - Init also creates `.claude/rules/*.md`, `.claude/instructions.md`, and `.claude/claude.md` when ai_tool is claude-desktop
