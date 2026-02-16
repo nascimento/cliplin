@@ -30,6 +30,8 @@ When you change **templates** or **MCP-related commands** in this project, you M
 
 ### Reference
 
-- Technical rules: `docs/ts4/ai-host-integration.ts4`
+- Cross-host rules: `docs/ts4/ai-host-integration.ts4`
+- Cursor-specific: `docs/ts4/cursor-integration.ts4`
+- Claude Desktop-specific (incl. Skills): `docs/ts4/claude-desktop-integration.ts4`
 - Cross-project references on evolution: `docs/ts4/cross-references-on-evolution.ts4`
 - MCP server instructions: `docs/adrs/004-mcp-server-instructions.md`, `docs/ts4/system-modules.ts4` (rule "MCP server must expose instructions")

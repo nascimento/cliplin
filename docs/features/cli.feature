@@ -39,6 +39,7 @@ Feature: Cliplin CLI Tool
       | features | Stores feature files |
       | tech-specs | Stores TS4 technical specifications |
       | uisi | Stores UI Intent YAML files |
+    And the CLI should ensure `.cliplin` is listed in `.gitignore`
     And the CLI should validate that the project structure is correct
     And the CLI should display a success message indicating project initialization is complete
 
@@ -57,6 +58,7 @@ Feature: Cliplin CLI Tool
     And the CLI should configure the Cliplin context MCP server for Cursor integration
     And the CLI should create `.cursor/rules/context.mdc` with Cliplin context MCP configuration
     And the CLI should create `.cursor/rules/feature-processing.mdc` with feature processing rules
+    And the CLI should ensure `.cliplin` is listed in `.gitignore`
     And the CLI should validate that Cursor-specific configurations are correct
     And the CLI should initialize context store collections as specified in the context rules
     And the CLI should display a success message indicating project initialization with Cursor is complete
@@ -76,6 +78,7 @@ Feature: Cliplin CLI Tool
     And the CLI should configure `.mcp.json` with Cliplin MCP server configuration
     And the CLI should create `.claude/claude.md` with instructions on how to use the rules
     And the CLI should configure the Cliplin MCP server for Claude Desktop integration
+    And the CLI should ensure `.cliplin` is listed in `.gitignore`
     And the CLI should validate that Claude Desktop-specific configurations are correct
     And the CLI should initialize context store collections as specified in the context rules
     And the CLI should display a success message indicating project initialization with Claude Desktop is complete

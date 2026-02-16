@@ -65,7 +65,8 @@ def init_command(
         # Create directory structure
         console.print("\n[bold]Creating directory structure...[/bold]")
         create_directory_structure(project_root)
-        
+        ensure_cliplin_in_gitignore(project_root)
+
         # Create configuration files
         console.print("\n[bold]Creating configuration files...[/bold]")
         create_readme_file(project_root)
@@ -124,6 +125,22 @@ def is_cliplin_initialized(project_root: Path) -> bool:
     """Check if Cliplin is already initialized in the project."""
     cliplin_dir = project_root / ".cliplin"
     return cliplin_dir.exists() and (cliplin_dir / "data" / "context").exists()
+
+
+def ensure_cliplin_in_gitignore(project_root: Path) -> None:
+    """Ensure .cliplin is listed in .gitignore (create or append); use UTF-8. Does not remove or reorder other lines."""
+    gitignore_path = project_root / ".gitignore"
+    entry = ".cliplin"
+    if not gitignore_path.exists():
+        gitignore_path.write_text(entry + "\n", encoding="utf-8")
+        console.print(f"  [green]✓[/green] Created .gitignore with {entry}")
+        return
+    content = gitignore_path.read_text(encoding="utf-8")
+    if any(entry in line for line in content.splitlines()):
+        return
+    new_content = content.rstrip("\n") + ("\n" if content else "") + entry + "\n"
+    gitignore_path.write_text(new_content, encoding="utf-8")
+    console.print(f"  [green]✓[/green] Added {entry} to .gitignore")
 
 
 def create_directory_structure(project_root: Path) -> None:

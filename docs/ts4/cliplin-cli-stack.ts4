@@ -50,6 +50,12 @@ rules:
     - Build text content as strings first, then pass to Rich constructors
     - Example: `console.print()` then `console.print(Panel.fit(text))` not `console.print("\n" + Panel.fit(text))`
   - |
+    Init and version control:
+    - When running `cliplin init`, the CLI MUST ensure the `.cliplin` directory is ignored by Git.
+    - If `.gitignore` exists in the project root, append `.cliplin` (or ensure a line containing `.cliplin` is present) if not already present; use UTF-8 encoding for read/write.
+    - If `.gitignore` does not exist, create it at project root with a single line `.cliplin`.
+    - Do not remove or reorder other lines in `.gitignore`; only add or ensure the `.cliplin` entry.
+  - |
     Template directory discovery:
     - Search in order: package_dir/template, project_root/template, cwd/template, ~/.cliplin/template
     - Template directory must contain required structure for project initialization
