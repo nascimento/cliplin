@@ -9,25 +9,6 @@ from rich.console import Console
 
 console = Console()
 
-# AI tool configurations
-AI_TOOL_CONFIGS: Dict[str, Dict[str, Optional[str]]] = {
-    "cursor": {
-        "rules_dir": ".cursor/rules",
-        "config_file": ".cursor/rules/context.mdc",
-        "feature_processing_file": ".cursor/rules/feature-processing.mdc",
-        "context_protocol_loading_file": ".cursor/rules/context-protocol-loading.mdc",
-        "feature_first_flow_file": ".cursor/rules/feature-first-flow.mdc",
-    },
-    "claude-desktop": {
-        "rules_dir": ".claude/rules",
-        "config_file": ".mcp.json",
-        "feature_processing_file": ".claude/rules/feature-processing.md",
-        "context_protocol_loading_file": ".claude/rules/context-protocol-loading.md",
-        "feature_first_flow_file": ".claude/rules/feature-first-flow.md",
-    },
-}
-
-
 def create_cliplin_config(target_dir: Path, ai_tool: Optional[str] = None) -> None:
     """Create or update cliplin.yaml at project root with optional ai_tool for validate to check MCP file."""
     config_path = target_dir / "cliplin.yaml"
@@ -444,90 +425,6 @@ annotations:
     
     adr_path.write_text(adr_content, encoding="utf-8")
     console.print(f"  [green]✓[/green] Created docs/adrs/002-ui-intent-format.md")
-
-
-def create_ai_tool_config(target_dir: Path, ai_tool: str) -> None:
-    """Create AI tool-specific configuration files."""
-    if ai_tool not in AI_TOOL_CONFIGS:
-        raise ValueError(f"Unknown AI tool: {ai_tool}")
-    
-    config = AI_TOOL_CONFIGS[ai_tool]
-    rules_dir = target_dir / config["rules_dir"]
-    rules_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Create MCP configuration files
-    if ai_tool == "cursor":
-        create_cursor_mcp_config(target_dir)
-    elif ai_tool == "claude-desktop":
-        create_claude_desktop_mcp_config(target_dir)
-    
-    # Create context.mdc for Cursor
-    if ai_tool == "cursor" and config["config_file"]:
-        context_file = target_dir / config["config_file"]
-        context_content = get_cursor_context_content()
-        context_file.write_text(context_content, encoding="utf-8")
-        console.print(f"  [green]✓[/green] Created {config['config_file']}")
-    
-    # Create feature-processing.mdc for Cursor
-    if ai_tool == "cursor" and config["feature_processing_file"]:
-        feature_file = target_dir / config["feature_processing_file"]
-        feature_content = get_cursor_feature_processing_content()
-        feature_file.write_text(feature_content, encoding="utf-8")
-        console.print(f"  [green]✓[/green] Created {config['feature_processing_file']}")
-    
-    # Create context-protocol-loading.mdc for Cursor
-    if ai_tool == "cursor" and config.get("context_protocol_loading_file"):
-        protocol_file = target_dir / config["context_protocol_loading_file"]
-        protocol_content = get_cursor_context_protocol_loading_content()
-        protocol_file.write_text(protocol_content, encoding="utf-8")
-        console.print(f"  [green]✓[/green] Created {config['context_protocol_loading_file']}")
-    
-    # Create feature-first-flow.mdc for Cursor
-    if ai_tool == "cursor" and config.get("feature_first_flow_file"):
-        flow_file = target_dir / config["feature_first_flow_file"]
-        flow_content = get_feature_first_flow_content()
-        flow_file.write_text(flow_content, encoding="utf-8")
-        console.print(f"  [green]✓[/green] Created {config['feature_first_flow_file']}")
-    
-    # Create feature-processing.md for Claude Desktop
-    if ai_tool == "claude-desktop" and config.get("feature_processing_file"):
-        feature_file = target_dir / config["feature_processing_file"]
-        feature_content = get_cursor_feature_processing_content()
-        feature_file.write_text(feature_content, encoding="utf-8")
-        console.print(f"  [green]✓[/green] Created {config['feature_processing_file']}")
-    
-    # Create context-protocol-loading.md for Claude Desktop
-    if ai_tool == "claude-desktop" and config.get("context_protocol_loading_file"):
-        protocol_file = target_dir / config["context_protocol_loading_file"]
-        protocol_content = get_cursor_context_protocol_loading_content()
-        protocol_file.write_text(protocol_content, encoding="utf-8")
-        console.print(f"  [green]✓[/green] Created {config['context_protocol_loading_file']}")
-    
-    # Create feature-first-flow.md for Claude Desktop
-    if ai_tool == "claude-desktop" and config.get("feature_first_flow_file"):
-        flow_file = target_dir / config["feature_first_flow_file"]
-        flow_content = get_feature_first_flow_content()
-        flow_file.write_text(flow_content, encoding="utf-8")
-        console.print(f"  [green]✓[/green] Created {config['feature_first_flow_file']}")
-    
-    # Create context.md for Claude Desktop in .claude/rules (similar to context.mdc for Cursor)
-    if ai_tool == "claude-desktop":
-        context_file = target_dir / ".claude" / "rules" / "context.md"
-        context_content = get_cursor_context_content()
-        context_file.write_text(context_content, encoding="utf-8")
-        console.print(f"  [green]✓[/green] Created .claude/rules/context.md")
-        
-        # Create main instructions file that consolidates all rules
-        instructions_file = target_dir / ".claude" / "instructions.md"
-        instructions_content = get_claude_desktop_instructions_content()
-        instructions_file.write_text(instructions_content, encoding="utf-8")
-        console.print(f"  [green]✓[/green] Created .claude/instructions.md")
-        
-        # Create claude.md with instructions on how to use the rules (replaces README)
-        claude_md_file = target_dir / ".claude" / "claude.md"
-        claude_md_content = get_claude_desktop_claude_md_content()
-        claude_md_file.write_text(claude_md_content, encoding="utf-8")
-        console.print(f"  [green]✓[/green] Created .claude/claude.md")
 
 
 def create_cursor_mcp_config(target_dir: Path) -> None:

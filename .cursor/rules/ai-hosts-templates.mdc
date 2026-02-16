@@ -17,13 +17,10 @@ When you change **templates** or **MCP-related commands** in this project, you M
    Use `"command": "uv", "args": ["run", "cliplin", "mcp"]` for both Cursor and Claude Desktop. Do not use bare `cliplin mcp` in generated configs (it can resolve to a global install and cause "No server info found" or wrong version).
 
 2. **Update both config generators together**  
-   In `src/cliplin/utils/templates.py`:
-   - `create_cursor_mcp_config` → writes `.cursor/mcp.json`
-   - `create_claude_desktop_mcp_config` → writes `.mcp.json` at project root  
-   If you change the MCP command, args, or env in one, change the other in the same edit. Do not update only Cursor or only Claude Desktop.
+   MCP config is written by `create_cursor_mcp_config` and `create_claude_desktop_mcp_config` in `src/cliplin/utils/templates.py` (invoked from the integration handlers in `src/cliplin/utils/ai_host_integrations/`). If you change the MCP command, args, or env in one, change the other in the same edit. Do not update only Cursor or only Claude Desktop.
 
 3. **New hosts**  
-   If adding support for another MCP host (e.g. another IDE), add a config generator in `templates.py`, use the same command pattern unless the host requires otherwise, and document the config path and quirks in `docs/ts4/ai-host-integration.ts4`.
+   If adding support for another MCP host (e.g. another IDE), add an integration class in `src/cliplin/utils/ai_host_integrations/` following the pattern in `docs/ts4/ai-host-integration-handler-pattern.ts4`, use the same command pattern unless the host requires otherwise, and document the config path and quirks in `docs/ts4/ai-host-integration.ts4`.
 
 4. **Cross-project reference update**  
    When changing templates or solutions that affect a shared concept (e.g. MCP, context store, capability name, config path), follow `docs/ts4/cross-references-on-evolution.ts4`: search the **entire project** for all references (other features in docs/features/, README, docs/business/, docs/adrs/, docs/ts4/, other templates, .cursor/rules/) and update them so the project stays consistent. Do not leave features, docs, or other templates pointing at old wording or behavior.

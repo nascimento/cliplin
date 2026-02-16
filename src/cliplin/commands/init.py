@@ -9,9 +9,11 @@ from rich.console import Console
 from rich.panel import Panel
 
 from cliplin.utils.chromadb import get_chromadb_client, initialize_collections
-from cliplin.utils.templates import (
-    AI_TOOL_CONFIGS,
+from cliplin.utils.ai_host_integrations import (
     create_ai_tool_config,
+    get_known_ai_tool_ids,
+)
+from cliplin.utils.templates import (
     create_cliplin_config,
     create_framework_adr,
     create_readme_file,
@@ -80,10 +82,10 @@ def init_command(
         
         # Create AI tool configuration if specified
         if ai:
-            if ai not in AI_TOOL_CONFIGS:
+            if ai not in get_known_ai_tool_ids():
                 console.print(
                     f"[bold red]Error:[/bold red] Unknown AI tool: {ai}\n"
-                    f"Available tools: {', '.join(AI_TOOL_CONFIGS.keys())}"
+                    f"Available tools: {', '.join(get_known_ai_tool_ids())}"
                 )
                 raise typer.Exit(code=1)
             

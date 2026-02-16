@@ -16,7 +16,7 @@ from cliplin.utils.chromadb import (
     get_chromadb_path,
     verify_collections,
 )
-from cliplin.utils.templates import AI_TOOL_CONFIGS
+from cliplin.utils.ai_host_integrations import get_integration, get_known_ai_tool_ids
 
 console = Console()
 
@@ -96,8 +96,9 @@ def validate_command() -> None:
     if config_file.exists():
         console.print(f"  [green]✓[/green] Config file exists")
         ai_tool: Optional[str] = _get_ai_tool_from_config(config_file)
-        if ai_tool is not None and ai_tool in AI_TOOL_CONFIGS:
-            mcp_path = AI_TOOL_CONFIGS[ai_tool].get("mcp_file")
+        if ai_tool is not None and ai_tool in get_known_ai_tool_ids():
+            integration = get_integration(ai_tool)
+            mcp_path = integration.mcp_config_path if integration else None
             if mcp_path:
                 mcp_file = project_root / mcp_path
                 if mcp_file.exists():
@@ -105,7 +106,7 @@ def validate_command() -> None:
                 else:
                     console.print(f"  [red]✗[/red] MCP config for {ai_tool!r} not found at {mcp_path}")
                     errors.append(f"Missing MCP config file for ai_tool {ai_tool!r}: {mcp_path}")
-        elif ai_tool is not None and ai_tool not in AI_TOOL_CONFIGS:
+        elif ai_tool is not None and ai_tool not in get_known_ai_tool_ids():
             console.print(f"  [yellow]⚠[/yellow]  Unknown ai_tool in config: {ai_tool!r}")
             warnings.append(f"Unknown ai_tool in config: {ai_tool!r}")
     else:

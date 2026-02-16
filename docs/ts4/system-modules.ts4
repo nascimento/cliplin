@@ -8,7 +8,7 @@ rules:
     Module layout:
     - `src/cliplin/cli.py`: CLI entry point and command registration only; no business logic for context or storage
     - `src/cliplin/commands/`: One module per CLI command (init, validate, reindex, feature, adr, tool); commands orchestrate and call shared utils
-    - `src/cliplin/utils/`: Shared functionality used by both CLI and MCP: chromadb (client, collections, document ops), templates, tools; add fingerprint/change-detection here so it is reusable
+    - `src/cliplin/utils/`: Shared functionality used by both CLI and MCP: chromadb (client, collections, document ops), templates, ai_host_integrations (one class per AI host, see docs/ts4/ai-host-integration-handler-pattern.ts4), tools; add fingerprint/change-detection here so it is reusable
     - MCP server: When the storage MCP is implemented, it must call the same utils (e.g. chromadb, fingerprint store) as the CLI; no duplicate implementation of "list collections", "add document", "query", "list changed documents", etc.
   - |
     Context locations as single source of truth:
