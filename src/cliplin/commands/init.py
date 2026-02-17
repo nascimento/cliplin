@@ -16,6 +16,7 @@ from cliplin.utils.ai_host_integrations import (
 from cliplin.utils.templates import (
     create_cliplin_config,
     create_framework_adr,
+    create_knowledge_packages_adr,
     create_readme_file,
     create_ts4_format_adr,
     create_ui_intent_format_adr,
@@ -79,6 +80,7 @@ def init_command(
         create_framework_adr(project_root)
         create_ts4_format_adr(project_root)
         create_ui_intent_format_adr(project_root)
+        create_knowledge_packages_adr(project_root)
         
         # Create AI tool configuration if specified
         if ai:
