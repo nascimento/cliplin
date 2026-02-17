@@ -15,6 +15,7 @@ from cliplin.commands.tool import tool_command
 from cliplin.commands.adr import adr_generate_command
 from cliplin.commands.knowledge import (
     knowledge_add_command,
+    knowledge_install_command,
     knowledge_list_command,
     knowledge_remove_command,
     knowledge_show_command,
@@ -109,6 +110,7 @@ knowledge_app.command(name="add")(knowledge_add_command)
 knowledge_app.command(name="remove")(knowledge_remove_command)
 knowledge_app.command(name="update")(knowledge_update_command)
 knowledge_app.command(name="show")(knowledge_show_command)
+knowledge_app.command(name="install")(knowledge_install_command)
 
 # Register commands
 app.command(name="init")(init_command)

@@ -445,7 +445,7 @@ This project uses Cliplin and can depend on **knowledge packages**: external rep
 
 ### Command and configuration
 
-- **CLI command**: `cliplin knowledge` with subcommands: `list`, `add`, `remove`, `update`, `show`.
+- **CLI command**: `cliplin knowledge` with subcommands: `list`, `add`, `remove`, `update`, `show`, `install`.
 - **Configuration**: Package list is declared in `cliplin.yaml` at project root under the top-level key `knowledge` (list of entries with `name`, `source`, `version`).
 - **Installation**: Packages live under `.cliplin/knowledge/<name>-<source_normalized>/`. Content is obtained via git sparse checkout; in multi-package repos the package **name** selects which top-level subfolder to install.
 
@@ -456,6 +456,7 @@ This project uses Cliplin and can depend on **knowledge packages**: external rep
 - `cliplin knowledge remove <name>` — Remove from config, delete directory, purge documents from context store.
 - `cliplin knowledge update <name>` — Update to the configured (or given) version and reindex.
 - `cliplin knowledge show <name>` — Show name, source, version, path, and file count.
+- `cliplin knowledge install` — Install all packages declared in cliplin.yaml (add if missing, update if installed). Use `--force` to reinstall from scratch with the configured version.
 
 ### Context store and visibility
 

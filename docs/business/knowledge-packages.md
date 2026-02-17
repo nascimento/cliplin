@@ -120,6 +120,19 @@ cliplin knowledge show <name>
 
 Shows name, source, version, install path, whether it is installed, and the **number of files** in the package directory (excluding `.git`).
 
+### Install all packages
+
+```bash
+cliplin knowledge install
+# or reinstall all (remove + clone fresh with configured version):
+cliplin knowledge install --force
+```
+
+- **Without `--force`**: For each package in `cliplin.yaml`, adds it if not installed or updates it if already installed. Idempotent sync.
+- **With `--force`**: For each package, removes its directory (and purges context store and fingerprint store), then clones fresh using the version in `cliplin.yaml`. Does not change the version in config. Use after corruption or to get a clean copy.
+
+Useful after cloning a project that has `knowledge: [...]` in `cliplin.yaml` but no `.cliplin/knowledge/` (e.g. it is gitignored).
+
 ---
 
 ## 4. Where things are installed

@@ -1,4 +1,4 @@
-"""Knowledge package manager command: list, add, remove, update, show."""
+"""Knowledge package manager command: list, add, remove, update, show, install."""
 
 import subprocess
 from pathlib import Path
@@ -34,6 +34,40 @@ from cliplin.commands.reindex import (
 )
 
 console = Console()
+
+
+def _reindex_and_link_skills(
+    project_root: Path,
+    name: str,
+    source: str,
+    config: dict,
+) -> None:
+    """Reindex a package and link skills if host integration supports it."""
+    store: ContextStore = get_context_store(project_root)
+    fingerprint_store: FingerprintStore = get_fingerprint_store(project_root)
+    pkg_path = get_package_path(project_root, name, source)
+    if store.is_initialized():
+        store.ensure_collections()
+        pkg_dir_arg = pkg_path.relative_to(project_root).as_posix()
+        files = get_files_to_reindex(
+            project_root,
+            file_path=None,
+            file_type=None,
+            directory=pkg_dir_arg,
+        )
+        for f in files:
+            try:
+                reindex_file(store, fingerprint_store, f, project_root, verbose=False)
+            except Exception:
+                pass
+    ai_tool = config.get("ai_tool")
+    if ai_tool:
+        integration = get_integration(ai_tool)
+        if integration is not None and hasattr(integration, "link_knowledge_skills"):
+            try:
+                integration.link_knowledge_skills(project_root, pkg_path)
+            except Exception:
+                pass
 
 
 def _require_config(project_root: Path) -> dict:
@@ -246,3 +280,81 @@ def knowledge_show_command(
             if _.is_file() and ".git" not in _.parts
         )
         console.print(f"[bold]Files:[/bold]   {file_count}")
+
+
+def knowledge_install_command(
+    force: bool = typer.Option(False, "--force", "-f", help="Reinstall all packages (remove + clone fresh) using configured version"),
+) -> None:
+    """Install all knowledge packages declared in cliplin.yaml."""
+    project_root = Path.cwd()
+    config = _require_config(project_root)
+    packages = get_knowledge_packages(config)
+
+    if not packages:
+        console.print("[dim]No knowledge packages declared in cliplin.yaml. Add one with: cliplin knowledge add <name> <source> <version>[/dim]")
+        return
+
+    store = get_context_store(project_root)
+    if store.is_initialized():
+        store.ensure_collections()
+
+    count = 0
+    for pkg in packages:
+        name = pkg["name"]
+        source = pkg["source"]
+        version = pkg["version"]
+        pkg_path = get_package_path(project_root, name, source)
+
+        if force:
+            if pkg_path.exists():
+                prefix = pkg_path.relative_to(project_root).as_posix() + "/"
+                if store.is_initialized():
+                    ids_by_collection = get_document_ids_by_file_path_prefix(store, prefix)
+                    for coll, ids in ids_by_collection.items():
+                        if ids:
+                            store.delete_documents(coll, ids)
+                remove_fingerprints_by_prefix(project_root, prefix)
+                ai_tool = config.get("ai_tool")
+                if ai_tool:
+                    integration = get_integration(ai_tool)
+                    if integration is not None and hasattr(integration, "unlink_knowledge_skills"):
+                        try:
+                            integration.unlink_knowledge_skills(project_root, pkg_path)
+                        except Exception:
+                            pass
+            remove_package_directory(project_root, name, source)
+            try:
+                clone_package(project_root, name, source, version)
+            except subprocess.CalledProcessError as e:
+                console.print(f"[bold red]Error[/bold red] reinstalling [cyan]{name}[/cyan]: {e.stderr or e}")
+                continue
+            except ValueError as e:
+                console.print(f"[bold red]Error[/bold red] reinstalling [cyan]{name}[/cyan]: {e}")
+                continue
+        else:
+            if pkg_path.exists():
+                try:
+                    update_package_checkout(project_root, name, source, version)
+                except subprocess.CalledProcessError as e:
+                    console.print(f"[bold red]Error[/bold red] updating [cyan]{name}[/cyan]: {e.stderr or e}")
+                    continue
+                except FileNotFoundError as e:
+                    console.print(f"[bold red]Error[/bold red] updating [cyan]{name}[/cyan]: {e}")
+                    continue
+            else:
+                try:
+                    clone_package(project_root, name, source, version)
+                except subprocess.CalledProcessError as e:
+                    console.print(f"[bold red]Error[/bold red] installing [cyan]{name}[/cyan]: {e.stderr or e}")
+                    continue
+                except ValueError as e:
+                    console.print(f"[bold red]Error[/bold red] installing [cyan]{name}[/cyan]: {e}")
+                    continue
+
+        _reindex_and_link_skills(project_root, name, source, config)
+        count += 1
+
+    if force:
+        console.print(Panel.fit(f"[bold green]✓[/bold green] Reinstalled [cyan]{count}[/cyan] package(s)."))
+    else:
+        console.print(Panel.fit(f"[bold green]✓[/bold green] Installed or updated [cyan]{count}[/cyan] package(s)."))

@@ -97,5 +97,29 @@ Feature: Cliplin Knowledge Package Manager
     Given I have the Cliplin CLI tool installed
     When I run `cliplin knowledge --help`
     Then the CLI should display usage for the `knowledge` command
-    And the CLI should list subcommands: list, add, remove, update, show
+    And the CLI should list subcommands: list, add, remove, update, show, install
     And the CLI should show the `knowledge` command in the main `cliplin --help` output
+
+  @status:implemented
+  @changed:2025-02-17
+  Scenario: Install all knowledge packages from cliplin.yaml
+    Given my project has a `cliplin.yaml` with a `knowledge` section containing one or more packages
+    And some packages may be installed and some may not
+    When I run `cliplin knowledge install`
+    Then the CLI should for each package declared in `cliplin.yaml`: add it if not installed, or update it if already installed
+    And the CLI should create or refresh package directories under `.cliplin/knowledge/` with the naming convention `<name>-<source_normalized>`
+    And the CLI should trigger reindexing for each package so its documents are indexed into the context store
+    And the CLI should display a success message indicating how many packages were installed or updated
+    And if the `knowledge` section is empty, the CLI should display an appropriate message and exit successfully
+
+  @status:implemented
+  @changed:2025-02-17
+  Scenario: Install with --force reinstalls all packages at their configured version
+    Given my project has a `cliplin.yaml` with a `knowledge` section containing one or more packages
+    When I run `cliplin knowledge install --force`
+    Then the CLI should for each package declared in `cliplin.yaml`: remove its directory if it exists, then clone it fresh using the version in `cliplin.yaml`
+    And the CLI should NOT change the version in `cliplin.yaml` (reinstall uses the same version as configured)
+    And the CLI should trigger reindexing for each package so the context store reflects the reinstalled content
+    And the CLI should remove from the context store and fingerprint store any previous documents for packages that existed before reinstalling
+    And the CLI should display a success message indicating how many packages were reinstalled
+    And packages that were not previously installed should be installed for the first time (same behavior as add)

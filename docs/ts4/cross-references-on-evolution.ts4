@@ -23,10 +23,14 @@ rules:
     - **Feature evolution**: When you change scenarios, steps, or acceptance criteria, search for other features, docs, templates, and rules that still refer to the old wording or behavior and update them.
     - **Solution or contract change**: When you change a contract (e.g. "context store" vs "ChromaDB"), config path, MCP name, or capability name, search all of the above and update every occurrence so nothing is left pointing at the old contract or name.
   - |
+    Feature ↔ template verification (MUST):
+    - When modifying a .feature file, consult docs/ts4/feature-template-mapping.ts4. If the feature has a template reflection (e.g. knowledge.feature ↔ create_knowledge_packages_adr), you MUST verify and update the corresponding template function in src/cliplin/utils/templates.py so generated content matches the feature spec. Do not leave templates out of sync with features.
+  - |
     Checklist before considering a feature or solution evolution complete:
     - [ ] Searched docs/features/ for other features that reference the same capability or entity; updated or added references as needed.
     - [ ] Searched README.md and docs/ (business, adrs) for descriptions of the same capability; updated wording to match.
     - [ ] Searched docs/ts4/ for specs that reference the same contract or naming; updated if needed.
+    - [ ] **Feature ↔ template**: If the modified feature has a template reflection (docs/ts4/feature-template-mapping.ts4), verified and updated src/cliplin/utils/templates.py so generated content matches the feature spec.
     - [ ] If templates or generated rules describe the same capability (e.g. MCP, context store), searched src/cliplin/utils/templates.py, src/cliplin/utils/ai_host_integrations/, and .cursor/rules (and .claude output) and updated so they stay in sync with features and docs.
     - [ ] Reindexed any modified context files (e.g. cliplin reindex) so the context store index stays current.
     - [ ] If changing knowledge package format (cliplin.yaml knowledge section), layout (.cliplin/knowledge/), or reindex rules for packages: updated docs/adrs/005-knowledge-packages.md, docs/ts4/knowledge-packages.ts4, docs/ts4/knowledge-reindex-context.ts4, docs/features/knowledge.feature, and docs/ts4/system-modules.ts4 (and docs/ts4/claude-desktop-integration.ts4 if skills behavior changes).
@@ -36,6 +40,7 @@ code_refs:
   - "docs/adrs/"
   - "docs/business/"
   - "docs/ts4/"
+  - "docs/ts4/feature-template-mapping.ts4"
   - "src/cliplin/utils/templates.py"
   - "src/cliplin/utils/ai_host_integrations/"
   - ".cursor/rules/"

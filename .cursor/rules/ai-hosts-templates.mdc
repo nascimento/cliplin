@@ -25,8 +25,12 @@ When you change **templates** or **MCP-related commands** in this project, you M
 4. **Cross-project reference update**  
    When changing templates or solutions that affect a shared concept (e.g. MCP, context store, capability name, config path), follow `docs/ts4/cross-references-on-evolution.ts4`: search the **entire project** for all references (other features in docs/features/, README, docs/business/, docs/adrs/, docs/ts4/, other templates, .cursor/rules/) and update them so the project stays consistent. Do not leave features, docs, or other templates pointing at old wording or behavior.
 
+5. **Feature → template verification**  
+   When modifying a .feature file that has a template reflection (see `docs/ts4/feature-template-mapping.ts4`), you MUST verify and update the corresponding template in `src/cliplin/utils/templates.py`. For example, knowledge.feature ↔ create_knowledge_packages_adr — any new subcommand or option in the feature must be reflected in the template.
+
 ### Reference
 
+- Feature ↔ template mapping: `docs/ts4/feature-template-mapping.ts4`
 - Cross-host rules: `docs/ts4/ai-host-integration.ts4`
 - Cursor-specific: `docs/ts4/cursor-integration.ts4`
 - Claude Desktop-specific (incl. Skills): `docs/ts4/claude-desktop-integration.ts4`
