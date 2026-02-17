@@ -166,7 +166,7 @@ For content to be indexed correctly, package repos should use the usual Cliplin 
 - **TS4**: `ts4/`, `docs/ts4/` (with `.ts4`).
 - **Features**: `features/`, `docs/features/` (with `.feature`).
 - **UI intent**: `ui-intent/`, `docs/ui-intent/` (with `.yaml`).
-- **Skills** (optional): `skills/` — if the host supports it (e.g. Claude Desktop), Cliplin can link them under `.claude/skills/`.
+- **Skills** (optional): folders containing `SKILL.md` under `skills/` (e.g. `skills/skill-folder/SKILL.md` or `skills/<pkg>/skill-folder/SKILL.md`) — if the host supports it (e.g. Claude Desktop), Cliplin finds all folders that contain `SKILL.md` and creates hard links for each file under `.claude/skills/`, so you get `.claude/skills/skill-folder/SKILL.md` (one level only, as Claude expects).
 
 Nested subfolders (e.g. `adrs/framework/001-foo.md`) are supported; indexing is structure-agnostic within these path patterns.
 
