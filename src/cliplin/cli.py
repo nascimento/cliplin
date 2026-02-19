@@ -104,7 +104,7 @@ adr_app = typer.Typer(name="adr", help="ADR-related commands")
 adr_app.command(name="generate")(adr_generate_command)
 
 # Create knowledge subcommand group
-knowledge_app = typer.Typer(name="knowledge", help="Manage knowledge packages (ADRs, TS4, features, etc.)")
+knowledge_app = typer.Typer(name="knowledge", help="Manage knowledge packages (ADRs, rules, features, etc.)")
 knowledge_app.command(name="list")(knowledge_list_command)
 knowledge_app.command(name="add")(knowledge_add_command)
 knowledge_app.command(name="remove")(knowledge_remove_command)

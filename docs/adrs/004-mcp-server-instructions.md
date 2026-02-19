@@ -22,7 +22,7 @@ This occurred with the Cliplin MCP server when it was built with FastMCP using o
 - When using **FastMCP**: construct the server with the `instructions` parameter set to a non-empty string. The string should describe what the server does and how to use it (e.g. which tools to call, which collections exist, and the rule "never proceed without loading context").
 - When using another MCP implementation: ensure the server returns equivalent metadata (name, version, and a short instruction text) in the handshake so that hosts do not log "No server info found" or treat the server as misconfigured.
 
-Technical rules are prescribed in the TS4 (e.g. "MCP server must expose instructions (MUST)" in system-modules).
+Technical rules are prescribed in the rules (e.g. "MCP server must expose instructions (MUST)" in system-modules).
 
 ## Consequences
 
@@ -41,9 +41,9 @@ Technical rules are prescribed in the TS4 (e.g. "MCP server must expose instruct
 **Symptom**: Cursor logs "No server info found" when connecting to the Cliplin MCP server.  
 **Cause**: The MCP server was not exposing `instructions` in the initialize response (FastMCP was created without the `instructions` parameter).  
 **Fix**: Add `instructions=<short description>` to the FastMCP constructor so the server returns both serverInfo and instructions.  
-**Prevention**: Document in TS4 and ADR that any Cliplin MCP server MUST expose instructions for host compatibility.
+**Prevention**: Document in rules and ADR that any Cliplin MCP server MUST expose instructions for host compatibility.
 
 ## References
 
-- TS4: system-modules — "MCP server must expose instructions (MUST)"
+- Rules: system-modules — "MCP server must expose instructions (MUST)"
 - docs/business/framework.md — Section 9 (Context Access via MCP)

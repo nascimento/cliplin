@@ -39,14 +39,14 @@ We evaluated using a vector database as the core of the system’s RAG. ChromaDB
 
 ### 4. Fit for a Spec/Context-Driven System (e.g. Cliplin)
 
-- **Collections by documentation type**: Instead of one large collection, use one collection per pillar (e.g. business-and-architecture, features, tech-specs, ui-intent). This keeps domains separate and lets query tools target the right collection.
+- **Collections by documentation type**: Instead of one large collection, use one collection per pillar (e.g. business-and-architecture, features, rules, ui-intent). This keeps domains separate and lets query tools target the right collection.
 - **Stable IDs and metadata**: Using a stable document ID (e.g. file path relative to project root) avoids duplicates and supports upserts. Metadata such as `file_path`, `type`, and `collection` enable traceability and selective updates. ChromaDB does not prescribe schema; the system defines it.
 - **Standard ChromaDB operations**: Add, update, query, and delete use ChromaDB’s standard API. Indexing and refresh workflows are built on these primitives; no product-specific RAG API is required.
 - **Single store**: The same ChromaDB instance can serve indexing pipelines and any consumer (CLI, MCP, scripts). One source of truth for context.
 
 ### 5. Change detection (fingerprint store)
 
-To support incremental indexing and “has this document changed?” checks (e.g. “revisar si han ocurrido cambios en los ts4”), the system maintains a **fingerprint store**: a mapping from document path (or ID) to a content fingerprint (e.g. SHA-256 of file content).
+To support incremental indexing and "has this document changed?" checks (e.g. "revisar si han ocurrido cambios en los rules"), the system maintains a **fingerprint store**: a mapping from document path (or ID) to a content fingerprint (e.g. SHA-256 of file content).
 
 - **Purpose**: Detect whether an indexed document has been updated on disk so that only changed or new files are reindexed; list documents that need reindexing by collection or directory.
 - **Recommended implementation: local JSON file** under the project context data path (e.g. `.cliplin/data/context/fingerprints.json`), mapping `file_path` → `{ "fingerprint": "<sha256>", "last_indexed_at": "<iso8601>" }` (or equivalent).  
@@ -60,7 +60,7 @@ To support incremental indexing and “has this document changed?” checks (e.g
 |--------|----------|
 | Vector engine | ChromaDB (PersistentClient) |
 | Storage | Project data directory (path resolved for cross-platform use) |
-| Collections | One per documentation pillar (e.g. business-and-architecture, features, tech-specs, uisi) |
+| Collections | One per documentation pillar (e.g. business-and-architecture, features, rules, uisi) |
 | Document ID | Stable identifier (e.g. relative file path) |
 | Metadata | At least file_path, type, collection (system-defined) |
 | Search | Semantic (embeddings) + optional metadata and content filters |

@@ -1,6 +1,6 @@
 """
 Knowledge package utilities: cliplin.yaml knowledge section, path normalization, git clone + sparse checkout.
-See docs/ts4/knowledge-packages.ts4 and docs/adrs/005-knowledge-packages.md.
+See docs/rules/knowledge-packages.md and docs/adrs/005-knowledge-packages.md.
 """
 
 import re
@@ -18,14 +18,13 @@ SPARSE_PATHS = [
     "docs/adrs",
     "docs/business",
     "docs/features",
-    "docs/ts4",
+    "docs/rules",
     "docs/ui-intent",
     "adrs",
     "business",
     "features",
-    "ts4",
-    "ui-intent",
     "rules",
+    "ui-intent",
     "skills",
     "templates",
 ]

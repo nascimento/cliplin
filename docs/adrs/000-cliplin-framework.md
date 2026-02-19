@@ -39,12 +39,12 @@ Cliplin is built on four complementary specification pillars, each with a precis
 - **Key principle**: Emphasizes semantic meaning over visual appearance
 - **Usage**: Allows AI to generate UI code without guessing user experience decisions
 
-#### 3. TS4 – Technical Specification Files (YAML)
+#### 3. Rules – Project Rules Files (.rules)
 - **Purpose**: Define *how software must be implemented*
-- **Location**: `docs/ts4/*.ts4`
-- **Key principle**: TS4 does not describe what to build. It defines how to build it correctly.
+- **Location**: `docs/rules/*.rules`
+- **Key principle**: Rules do not describe what to build. They define how to build it correctly.
 - **Contains**: Coding conventions, naming rules, validation strategies, allowed/forbidden patterns, project-specific technical decisions
-- **Format**: YAML with `ts4`, `id` (kebab-case), `title`, `summary`, `rules[]`, optional `code_refs[]`
+- **Format**: YAML with `rules`, `id` (kebab-case), `title`, `summary`, `rules[]`, optional `code_refs[]`
 - **Role**: Acts as a technical contract for implementation
 
 #### 4. Architecture Decision Records and Business Documentation (ADRs and .md files)
@@ -58,7 +58,7 @@ Cliplin is built on four complementary specification pillars, each with a precis
 **Valid Inputs Only:**
 - Business Features (.feature in docs/features/)
 - UI Intent specifications (.yaml in docs/ui-intent/)
-- TS4 technical rules (.ts4 in docs/ts4/)
+- Project rules (.rules in docs/rules/)
 - ADRs and business documentation (.md in docs/adrs/ and docs/business/)
 
 **Everything else is noise.** All outputs must be traceable back to a specification.
@@ -68,7 +68,7 @@ Cliplin is built on four complementary specification pillars, each with a precis
 Cliplin works by **deliberate limitation**:
 - Business constraints (Features)
 - Semantic constraints (UI Intent)
-- Technical constraints (TS4)
+- Technical constraints (Rules)
 - Architectural constraints (ADRs)
 
 Creativity is replaced by clarity.

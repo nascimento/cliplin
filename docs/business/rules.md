@@ -1,7 +1,5 @@
 # Rules: Technical Specs for AI
 
-> This document has been superseded by [rules.md](rules.md).
-
 ## What is Rules?
 
 Rules (Technical Specs for AI) is a lightweight, human-readable format for documenting technical decisions, implementation rules, and code references. It uses simple YAML files that are compact, easy to maintain, and optimized for AI indexing and retrieval.
@@ -77,7 +75,7 @@ This allows the editor to recognize `.rules` files as YAML and provide appropria
 
 ## Towards an Open Standard
 
-TS4 does not replace **ADRs (Architecture Decision Records)**; it complements them as a lightweight technical specification format geared towards AI agents and intelligences.
+Rules does not replace **ADRs (Architecture Decision Records)**; it complements them as a lightweight technical specification format geared towards AI agents and intelligences.
 
 The goal of Rules is to become a standard for technical documentation that AI can understand and use effectively.
 

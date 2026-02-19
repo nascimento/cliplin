@@ -62,11 +62,11 @@ These specs allow AI to generate UI code without guessing user experience decisi
 
 ---
 
-### 3.3 TS4 – Technical Specification Files (YAML)
+### 3.3 Rules – Project Rules Files (.rules)
 
 **Purpose:** Define *how software must be implemented*.
 
-TS4 files act as a **technical contract** and include:
+Rules files act as a **technical contract** and include:
 
 * Coding conventions
 * Naming rules
@@ -76,7 +76,7 @@ TS4 files act as a **technical contract** and include:
 
 **Key principle:**
 
-> TS4 does not describe what to build. It defines how to build it correctly.
+> Rules do not describe what to build. They define how to build it correctly.
 
 ---
 
@@ -104,7 +104,7 @@ Only the following are valid inputs:
 
 * Business Features (.feature)
 * UI Intent specifications
-* TS4 technical rules
+* Project rules (.rules files)
 * ADRs and business documentation
 
 Anything else is noise.
@@ -117,7 +117,7 @@ Cliplin works by **deliberate limitation**:
 
 * Business constraints (Features)
 * Semantic constraints (UI Intent)
-* Technical constraints (TS4)
+* Technical constraints (Rules)
 * Architectural constraints (ADRs)
 
 Creativity is replaced by clarity.
@@ -164,7 +164,7 @@ To be executed autonomously and safely.
 
 For Cliplin to work correctly, **the feature file must always be the source of truth**. The operational flow is:
 
-1. **On any user change or request** (new behavior, fix, refactor, or enhancement), the **first** thing to do is consider whether the feature spec needs to change. If it does, **update the relevant `.feature` file first** — before changing any other file (code, TS4, ADRs, etc.).
+1. **On any user change or request** (new behavior, fix, refactor, or enhancement), the **first** thing to do is consider whether the feature spec needs to change. If it does, **update the relevant `.feature` file first** — before changing any other file (code, rules, ADRs, etc.).
 2. **Then**, based on the (updated or existing) specs, perform the refactors or new code needed. All implementation must **satisfy the specs**; the spec drives what is built.
 3. If the requested scope has no feature yet, **create or update the feature file first**, then implement to fulfill it.
 
@@ -222,14 +222,14 @@ Cliplin exposes the context store to AI tools (e.g. Cursor, Claude Desktop) via 
 
 - **Configuration**: The host (Cursor, Claude Desktop, etc.) reads a config file (e.g. `.cursor/mcp.json`) that declares available MCP servers and how to run them.
 - **Command**: For Cliplin, the server is started by running `cliplin mcp` (or the configured command). The host launches this process and communicates over **stdio** (stdin/stdout); no network port is used.
-- **Working directory**: The host typically starts the process with the **project root** as the current working directory. Cliplin assumes `cwd` is the project root when resolving paths (e.g. `.cliplin/data/context/`, `docs/ts4/`).
+- **Working directory**: The host typically starts the process with the **project root** as the current working directory. Cliplin assumes `cwd` is the project root when resolving paths (e.g. `.cliplin/data/context/`, `docs/rules/`).
 - **Clean stdio**: The `cliplin mcp` command must not print banners, help text, or any extra output to stdout. Only MCP protocol messages go over stdio; any other output would break the protocol.
 - **Server instructions**: The MCP server must expose **instructions** (a short description of its purpose and how to use it) in the MCP handshake. Without this, some hosts (e.g. Cursor) send GetInstructions, get no usable response, and log "No server info found." The server must always return both serverInfo and instructions so that the host can display the server correctly and the AI knows how to use it.
 
 ### Role of the context server
 
-The MCP server exposes tools such as: list collections, query documents by semantic search, add/update/delete documents, and check whether documents have changed (fingerprint store). These tools allow the AI to load relevant context (ADRs, features, TS4, UI intent) before answering or generating code, in line with the rule *"Never proceed without context."*
+The MCP server exposes tools such as: list collections, query documents by semantic search, add/update/delete documents, and check whether documents have changed (fingerprint store). These tools allow the AI to load relevant context (ADRs, features, rules, UI intent) before answering or generating code, in line with the rule *"Never proceed without context."*
 
 ### Supported hosts and config consistency
 
-Supported AI hosts include **Cursor** (`.cursor/mcp.json`; rules in `.cursor/rules/`) and **Claude Desktop** (`.mcp.json` at project root; rules in `.claude/rules/`; Skills supported). When changing how the MCP server is started (e.g. command or args in init templates), the same command must be used for all hosts so that every host runs the project's Cliplin with the same behavior. See `docs/ts4/ai-host-integration.ts4` for cross-host rules and the checklist; host-specific specs: `docs/ts4/cursor-integration.ts4`, `docs/ts4/claude-desktop-integration.ts4`.
+Supported AI hosts include **Cursor** (`.cursor/mcp.json`; rules in `.cursor/rules/`) and **Claude Desktop** (`.mcp.json` at project root; rules in `.claude/rules/`; Skills supported). When changing how the MCP server is started (e.g. command or args in init templates), the same command must be used for all hosts so that every host runs the project's Cliplin with the same behavior. See `docs/rules/ai-host-integration.rules` for cross-host rules and the checklist; host-specific specs: `docs/rules/cursor-integration.rules`, `docs/rules/claude-desktop-integration.rules`.

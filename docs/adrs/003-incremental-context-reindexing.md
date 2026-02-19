@@ -5,7 +5,7 @@ Accepted
 
 ## Context
 
-The Cliplin context store (ChromaDB) indexes documentation (ADRs, features, TS4, UI intent) for semantic search and RAG. Indexing requires reading files, computing embeddings, and writing to the vector store. Reindexing **all** context files on every run is expensive and unnecessary when most files have not changed.
+The Cliplin context store (ChromaDB) indexes documentation (ADRs, features, rules, UI intent) for semantic search and RAG. Indexing requires reading files, computing embeddings, and writing to the vector store. Reindexing **all** context files on every run is expensive and unnecessary when most files have not changed.
 
 We need a strategy that:
 
@@ -23,7 +23,7 @@ ADR-002 already defines a **fingerprint store** (path → content fingerprint, e
 2. **Skip unchanged files**: Do not call add or update on the context store for files whose fingerprint matches the current file content.
 3. **After successfully indexing a file**: Update the fingerprint store with the new fingerprint so future runs see the file as unchanged until it is edited again.
 
-Implementation must use the shared fingerprint logic (see `docs/ts4/system-modules.ts4`) so that CLI reindex, MCP add/update, and any future "list changed documents" or "validate changes" command all rely on the same contract. Technical rules are prescribed in the TS4 (e.g. "Incremental reindex (MUST)" in system-modules).
+Implementation must use the shared fingerprint logic (see `docs/rules/system-modules.rules`) so that CLI reindex, MCP add/update, and any future "list changed documents" or "validate changes" command all rely on the same contract. Technical rules are prescribed in the rules file (e.g. "Incremental reindex (MUST)" in system-modules).
 
 ## Consequences
 
@@ -40,5 +40,5 @@ Implementation must use the shared fingerprint logic (see `docs/ts4/system-modul
 ## References
 
 - ADR-002: ChromaDB as RAG and Context Store Base (fingerprint store definition)
-- TS4: system-modules — "Incremental reindex (MUST)", "Change detection and fingerprint logic (shared)"
+- Rules: system-modules — "Incremental reindex (MUST)", "Change detection and fingerprint logic (shared)"
 - Feature: mcp-storage.feature — scenarios for fingerprint-based change detection

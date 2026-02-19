@@ -30,7 +30,7 @@ def reindex_command(
     type: Optional[str] = typer.Option(
         None,
         "--type",
-        help="Reindex files of a specific type (ts4, feature, md, yaml)",
+        help="Reindex files of a specific type (rules, feature, md, yaml)",
     ),
     directory: Optional[str] = typer.Option(
         None,
@@ -148,7 +148,7 @@ def get_files_to_reindex(
         if not collection:
             raise ValueError(
                 f"File is not in a valid context directory: {file_path}\n"
-                "Valid directories: docs/adrs, docs/business, docs/features, docs/ts4, docs/ui-intent"
+                "Valid directories: docs/adrs, docs/business, docs/features, docs/rules, docs/ui-intent"
             )
         
         files.append(full_path)
@@ -156,7 +156,7 @@ def get_files_to_reindex(
     elif file_type:
         # Files of specific type
         type_mapping = {
-            "ts4": ("docs/ts4", "*.ts4"),
+            "rules": ("docs/rules", "*.md"),
             "feature": ("docs/features", "*.feature"),
             "md": ("docs/adrs", "*.md"),  # Could be adrs or business
             "yaml": ("docs/ui-intent", "*.yaml"),

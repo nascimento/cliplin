@@ -24,10 +24,10 @@ COLLECTION_MAPPINGS = {
         "file_pattern": "*.feature",
         "type": "feature",
     },
-    "tech-specs": {
-        "directories": ["docs/ts4"],
-        "file_pattern": "*.ts4",
-        "type": "ts4",
+    "rules": {
+        "directories": ["docs/rules"],
+        "file_pattern": "*.md",
+        "type": "rules",
     },
     "uisi": {
         "directories": ["docs/ui-intent"],
@@ -48,8 +48,8 @@ KNOWLEDGE_PATH_MAPPINGS: List[Tuple[str, str, str, str]] = [
     ("business", "*.md", "business-and-architecture", "project-doc"),
     ("docs/features", "*.feature", "features", "feature"),
     ("features", "*.feature", "features", "feature"),
-    ("docs/ts4", "*.ts4", "tech-specs", "ts4"),
-    ("ts4", "*.ts4", "tech-specs", "ts4"),
+    ("docs/rules", "*.md", "rules", "rules"),
+    ("rules", "*.md", "rules", "rules"),
     ("docs/ui-intent", "*.yaml", "uisi", "ui-intent"),
     ("ui-intent", "*.yaml", "uisi", "ui-intent"),
 ]

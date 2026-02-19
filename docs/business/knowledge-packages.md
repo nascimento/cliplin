@@ -1,6 +1,6 @@
 # Knowledge Packages
 
-Cliplin can manage **knowledge packages**: external repositories that contain ADRs, TS4, business docs, features, rules, or skills. Those packages are installed under your project and **indexed in the same context store** as your own specs, so the AI can use them as context.
+Cliplin can manage **knowledge packages**: external repositories that contain ADRs, rules, business docs, features, or skills. Those packages are installed under your project and **indexed in the same context store** as your own specs, so the AI can use them as context.
 
 ---
 
@@ -41,7 +41,7 @@ Example: repo structure:
 repo/
 ├── aws/
 │   ├── adrs/
-│   ├── ts4/
+│   ├── rules/
 │   └── ...
 ├── commons/
 │   ├── docs/adrs/
@@ -49,11 +49,11 @@ repo/
 └── redis/
 ```
 
-When you run `cliplin knowledge add aws github:org/repo main`, only the **content of the `aws/` folder** is installed under `.cliplin/knowledge/aws-.../` (with `adrs/`, `ts4/`, etc. at the root of that directory). The same repo can provide several packages with different names.
+When you run `cliplin knowledge add aws github:org/repo main`, only the **content of the `aws/` folder** is installed under `.cliplin/knowledge/aws-.../` (with `adrs/`, `rules/`, etc. at the root of that directory). The same repo can provide several packages with different names.
 
 ### Single-package repo (whole repo is one package)
 
-The repository **root** contains the usual Cliplin layout (`docs/adrs/`, `docs/ts4/`, etc.). There is no top-level folder matching the package name. In that case, Cliplin installs the root-level context paths and the package root is the repo root.
+The repository **root** contains the usual Cliplin layout (`docs/adrs/`, `docs/rules/`, etc.). There is no top-level folder matching the package name. In that case, Cliplin installs the root-level context paths and the package root is the repo root.
 
 ---
 
@@ -84,7 +84,7 @@ cliplin knowledge add aws github:Rodrigonavarro23/cliplin-knowledge main
 - Adds the entry to `cliplin.yaml`.
 - Clones the repo with **sparse checkout** (only the needed paths or the `<name>/` subfolder).
 - Installs under `.cliplin/knowledge/<name>-<source_normalized>/`.
-- **Reindexes** that package so its content is in the context store (business-and-architecture, tech-specs, features, uisi as per file type).
+- **Reindexes** that package so its content is in the context store (business-and-architecture, rules, features, uisi as per file type).
 - If you use Claude Desktop, skills from the package are linked under `.claude/skills/`.
 
 ### Remove a package
@@ -141,7 +141,7 @@ Useful after cloning a project that has `knowledge: [...]` in `cliplin.yaml` but
 - **Per package**: `.cliplin/knowledge/<name>-<source_normalized>/`  
   Example: `aws-github-Rodrigonavarro23-cliplin-knowledge`.
 
-The content inside each package directory follows the same layout as your project (e.g. `adrs/`, `ts4/`, `docs/features/`), so the same indexing rules apply.
+The content inside each package directory follows the same layout as your project (e.g. `adrs/`, `rules/`, `docs/features/`), so the same indexing rules apply.
 
 ---
 
@@ -154,7 +154,7 @@ The content inside each package directory follows the same layout as your projec
   cliplin reindex --directory .cliplin/knowledge
   ```
 
-Documents from knowledge packages use the same collections as your own specs (e.g. ADRs → `business-and-architecture`, TS4 → `tech-specs`). The AI sees them when loading context via the Cliplin MCP.
+Documents from knowledge packages use the same collections as your own specs (e.g. ADRs → `business-and-architecture`, rules → `rules` collection (the project's technical rules)). The AI sees them when loading context via the Cliplin MCP.
 
 ---
 
@@ -163,7 +163,7 @@ Documents from knowledge packages use the same collections as your own specs (e.
 For content to be indexed correctly, package repos should use the usual Cliplin paths:
 
 - **ADRs / business**: `adrs/`, `docs/adrs/`, `business/`, `docs/business/` (with `.md`).
-- **TS4**: `ts4/`, `docs/ts4/` (with `.ts4`).
+- **Rules**: `rules/`, `docs/rules/` (with `.rules`).
 - **Features**: `features/`, `docs/features/` (with `.feature`).
 - **UI intent**: `ui-intent/`, `docs/ui-intent/` (with `.yaml`).
 - **Skills** (optional): folders containing `SKILL.md` under `skills/` (e.g. `skills/skill-folder/SKILL.md` or `skills/<pkg>/skill-folder/SKILL.md`) — if the host supports it (e.g. Claude Desktop), Cliplin finds all folders that contain `SKILL.md` and creates hard links for each file under `.claude/skills/`, so you get `.claude/skills/skill-folder/SKILL.md` (one level only, as Claude expects).
@@ -176,4 +176,4 @@ Nested subfolders (e.g. `adrs/framework/001-foo.md`) are supported; indexing is 
 
 - **ADR**: [005-knowledge-packages.md](../adrs/005-knowledge-packages.md)
 - **Feature**: [knowledge.feature](../features/knowledge.feature)
-- **TS4**: [knowledge-packages.ts4](../ts4/knowledge-packages.ts4), [knowledge-reindex-context.ts4](../ts4/knowledge-reindex-context.ts4)
+- **Rules**: [knowledge-packages.rules](../rules/knowledge-packages.rules), [knowledge-reindex-context.rules](../rules/knowledge-reindex-context.rules)

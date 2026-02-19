@@ -55,8 +55,8 @@ Feature: Cliplin Storage MCP
   @changed:2025-01-30
   Scenario: Get collection information
     Given the storage MCP server is running and connected to the project context store
-    And a collection named "tech-specs" exists
-    When I invoke the MCP tool to get collection info for "tech-specs"
+    And a collection named "rules" exists
+    When I invoke the MCP tool to get collection info for "rules"
     Then the MCP should return information about the collection
     And the information may include name, metadata, and embedding configuration
     And if the collection does not exist, the MCP should return an error or clear failure indication
@@ -87,8 +87,8 @@ Feature: Cliplin Storage MCP
   @changed:2025-01-30
   Scenario: Add documents to a collection (index)
     Given the storage MCP server is running and connected to the project context store
-    And a collection named "tech-specs" exists
-    When I invoke the MCP tool to add documents to "tech-specs" with:
+    And a collection named "rules" exists
+    When I invoke the MCP tool to add documents to "rules" with:
       | documents | ids | metadatas (optional) |
       | ["Document A text", "Document B text"] | ["id-1", "id-2"] | optional metadata per document |
     Then the MCP should index the documents into the collection
@@ -140,7 +140,7 @@ Feature: Cliplin Storage MCP
   @changed:2025-01-30
   Scenario: Delete documents from a collection
     Given the storage MCP server is running and connected to the project context store
-    And a collection named "tech-specs" exists and contains documents with known IDs
+    And a collection named "rules" exists and contains documents with known IDs
     When I invoke the MCP tool to delete documents by a list of IDs
     Then the MCP should remove those documents from the collection
     And the document count should decrease by the number of deleted documents
@@ -184,8 +184,8 @@ Feature: Cliplin Storage MCP
   @status:new
   Scenario: Query with metadata filter
     Given the storage MCP server is running and connected to the project context store
-    And a collection named "tech-specs" exists with documents that have metadata "type" and "file_path"
-    When I invoke the MCP tool to query the collection with a query text and a metadata filter (e.g. type equals "ts4")
+    And a collection named "rules" exists with documents that have metadata "type" and "file_path"
+    When I invoke the MCP tool to query the collection with a query text and a metadata filter (e.g. type equals "rules")
     Then the MCP should perform semantic search only over documents matching the metadata filter
     And the returned documents should satisfy both similarity and filter criteria
     And the MCP should support at least equality filters; comparison and logical operators may be supported as documented
@@ -220,8 +220,8 @@ Feature: Cliplin Storage MCP
   Scenario: Check if a document has been updated since last index
     Given the storage MCP server is running and connected to the project context store
     And a fingerprint store exists (e.g. mapping file path to hash or checksum)
-    And a document at path "docs/ts4/example.ts4" was previously indexed and has a stored fingerprint
-    When I invoke the MCP tool to check if the document at path "docs/ts4/example.ts4" has changed
+    And a document at path "docs/rules/example.rules" was previously indexed and has a stored fingerprint
+    When I invoke the MCP tool to check if the document at path "docs/rules/example.rules" has changed
     Then the MCP should compute the current fingerprint of the file (e.g. SHA-256 of content)
     And the MCP should compare it with the stored fingerprint for that path
     And the MCP should return whether the document has changed (e.g. true/false or status)
@@ -233,9 +233,9 @@ Feature: Cliplin Storage MCP
   @changed:2025-01-30
   Scenario: Check if document has changed when file was modified on disk
     Given the storage MCP server is running and connected to the project context store
-    And a fingerprint store exists with a stored fingerprint for "docs/ts4/my-spec.ts4"
-    And the file "docs/ts4/my-spec.ts4" has been modified on disk since it was last indexed
-    When I invoke the MCP tool to check if the document at path "docs/ts4/my-spec.ts4" has changed
+    And a fingerprint store exists with a stored fingerprint for "docs/rules/my-spec.rules"
+    And the file "docs/rules/my-spec.rules" has been modified on disk since it was last indexed
+    When I invoke the MCP tool to check if the document at path "docs/rules/my-spec.rules" has changed
     Then the MCP should compute the current fingerprint of the file
     And the MCP should determine that the current fingerprint differs from the stored fingerprint
     And the MCP should return that the document has changed (e.g. needs reindexing)
@@ -259,7 +259,7 @@ Feature: Cliplin Storage MCP
     Given the storage MCP server is running and connected to the project context store
     And a fingerprint store exists with fingerprints for previously indexed documents
     And some context files have been modified on disk or are new (no stored fingerprint)
-    When I invoke the MCP tool to list changed documents for collection "tech-specs" or for directories "docs/ts4", "docs/features"
+    When I invoke the MCP tool to list changed documents for collection "rules" or for directories "docs/rules", "docs/features"
     Then the MCP should return the list of file paths that have changed (current fingerprint differs from stored) or are new (no fingerprint)
     And the MCP may return paths that are in the fingerprint store but no longer exist on disk (deleted files) so the caller can remove them from the index
     And the result may be scoped by collection name, by directory list, or by file type

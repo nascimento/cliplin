@@ -100,7 +100,7 @@ def generate_implementation_prompt(
     prompt_parts.append("")
     prompt_parts.append("Please implement this feature following the Cliplin framework:")
     prompt_parts.append("")
-    prompt_parts.append("1. **Load context**: Query ChromaDB collections to retrieve relevant context (ADRs, TS4 specs, related features, UI Intent)")
+    prompt_parts.append("1. **Load context**: Query ChromaDB collections to retrieve relevant context (ADRs, rules, related features, UI Intent)")
     prompt_parts.append("2. **Analyze the feature**: Review all scenarios and understand the business requirements")
     prompt_parts.append("3. **Review context**: Consider the business context, technical constraints, and related features")
     prompt_parts.append("4. **Design architecture**: Identify domain entities, use cases, and boundaries")

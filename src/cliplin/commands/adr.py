@@ -219,7 +219,7 @@ def generate_adr_prompt(
     prompt_parts.append("1. **Load existing context**:")
     prompt_parts.append("   - Query ChromaDB collection `business-and-architecture` for existing ADRs")
     prompt_parts.append("   - Review existing ADR patterns and format in the project")
-    prompt_parts.append("   - Query `tech-specs` collection for technical constraints")
+    prompt_parts.append("   - Query `rules` collection for technical constraints (the project's implementation rules)")
     prompt_parts.append("")
     prompt_parts.append("2. **Follow project patterns**:")
     prompt_parts.append("   - Use the same ADR format as existing ADRs in the project")

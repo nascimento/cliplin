@@ -18,7 +18,7 @@ from cliplin.utils.templates import (
     create_framework_adr,
     create_knowledge_packages_adr,
     create_readme_file,
-    create_ts4_format_adr,
+    create_rules_format_adr,
     create_ui_intent_format_adr,
 )
 
@@ -29,8 +29,7 @@ REQUIRED_DIRS = [
     "docs/adrs",
     "docs/business",
     "docs/features",
-    "docs/ts4",
-    "docs/ui-intent",
+    "docs/rules",
     ".cliplin/data/context",
 ]
 
@@ -78,7 +77,7 @@ def init_command(
         # Create framework context ADRs
         console.print("\n[bold]Creating framework context documentation...[/bold]")
         create_framework_adr(project_root)
-        create_ts4_format_adr(project_root)
+        create_rules_format_adr(project_root)
         create_ui_intent_format_adr(project_root)
         create_knowledge_packages_adr(project_root)
         
@@ -114,7 +113,7 @@ def init_command(
             "\nNext steps:\n"
             "  - Run 'cliplin reindex' to index framework context ADRs\n"
             "  - Add your feature files to docs/features/\n"
-            "  - Add your TS4 specs to docs/ts4/\n"
+            "  - Add your rules to docs/rules/\n"
             "  - Run 'cliplin reindex' again to index your new context files"
         )
         console.print()

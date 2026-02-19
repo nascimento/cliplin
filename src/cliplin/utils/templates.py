@@ -53,13 +53,13 @@ This project uses Cliplin for AI-assisted development driven by specifications.
 - `docs/adrs/` - Architecture Decision Records
 - `docs/business/` - Business documentation
 - `docs/features/` - Feature files (Gherkin)
-- `docs/ts4/` - Technical specifications
+- `docs/rules/` - Project rules and technical specifications
 - `docs/ui-intent/` - UI Intent specifications
 
 ## Getting Started
 
 1. Add your feature files to `docs/features/`
-2. Add your TS4 specifications to `docs/ts4/`
+2. Add your rules to `docs/rules/`
 3. Add your business documentation to `docs/business/`
 4. Run `cliplin reindex` to index your context files
 """
@@ -114,12 +114,12 @@ Cliplin is built on four complementary specification pillars, each with a precis
 - **Key principle**: Emphasizes semantic meaning over visual appearance
 - **Usage**: Allows AI to generate UI code without guessing user experience decisions
 
-#### 3. TS4 – Technical Specification Files (YAML)
+#### 3. Rules – Project Rules Files (.md)
 - **Purpose**: Define *how software must be implemented*
-- **Location**: `docs/ts4/*.ts4`
-- **Key principle**: TS4 does not describe what to build. It defines how to build it correctly.
+- **Location**: `docs/rules/*.md`
+- **Key principle**: Rules do not describe what to build. They define how to build it correctly.
 - **Contains**: Coding conventions, naming rules, validation strategies, allowed/forbidden patterns, project-specific technical decisions
-- **Format**: YAML with `ts4`, `id` (kebab-case), `title`, `summary`, `rules[]`, optional `code_refs[]`
+- **Format**: Markdown with YAML frontmatter (`rules: "1.0"`, `id`, `title`, `summary`), `# Rules` section, and optional `# Code Refs` section
 - **Role**: Acts as a technical contract for implementation
 
 #### 4. Architecture Decision Records and Business Documentation (ADRs and .md files)
@@ -133,7 +133,7 @@ Cliplin is built on four complementary specification pillars, each with a precis
 **Valid Inputs Only:**
 - Business Features (.feature in docs/features/)
 - UI Intent specifications (.yaml in docs/ui-intent/)
-- TS4 technical rules (.ts4 in docs/ts4/)
+- Project rules (.md in docs/rules/)
 - ADRs and business documentation (.md in docs/adrs/ and docs/business/)
 
 **Everything else is noise.** All outputs must be traceable back to a specification.
@@ -143,7 +143,7 @@ Cliplin is built on four complementary specification pillars, each with a precis
 Cliplin works by **deliberate limitation**:
 - Business constraints (Features)
 - Semantic constraints (UI Intent)
-- Technical constraints (TS4)
+- Technical constraints (Rules)
 - Architectural constraints (ADRs)
 
 Creativity is replaced by clarity.
@@ -177,72 +177,76 @@ Every output must be traceable back to a specification.
     console.print(f"  [green]✓[/green] Created docs/adrs/000-cliplin-framework.md")
 
 
-def create_ts4_format_adr(target_dir: Path) -> None:
-    """Create ADR about TS4 format and usage."""
-    adr_path = target_dir / "docs" / "adrs" / "001-ts4-format.md"
+def create_rules_format_adr(target_dir: Path) -> None:
+    """Create ADR about the Rules format and usage."""
+    adr_path = target_dir / "docs" / "adrs" / "001-rules-format.md"
     adr_path.parent.mkdir(parents=True, exist_ok=True)
     
-    adr_content = """# ADR-001: TS4 Format and Usage
+    adr_content = """# ADR-001: Rules Format and Usage
 
 ## Status
 Accepted
 
 ## Context
 
-TS4 (Technical Specs for AI) is a lightweight, human-readable format for documenting technical decisions, implementation rules, and code references. This ADR explains the TS4 format so that AI assistants can understand and work with TS4 files correctly.
+The Rules format is a lightweight, human-readable format for documenting project-specific technical decisions, implementation rules, and code references. This ADR explains the Rules format so that AI assistants can understand and work with `.md` files in `docs/rules/` correctly.
 
 ## Decision
 
-### What is TS4?
+### What are Rules files?
 
-TS4 is a YAML-based format optimized for AI indexing and retrieval. Each TS4 file contains technical decisions, implementation rules, and code references in a compact, maintainable format.
+Rules files are Markdown documents with YAML frontmatter, optimized for AI indexing and retrieval. Each `.md` file in `docs/rules/` contains project-specific technical decisions, implementation rules (the technical rules of the project), and code references in a compact, maintainable format.
 
-### TS4 File Structure
+### Rules File Structure
 
-A typical TS4 file has the following structure:
+A typical rules file has the following structure:
 
-```yaml
-ts4: "1.0"
+```markdown
+---
+rules: "1.0"
 id: "system-input-validation"  # kebab-case identifier
 title: "System Input Validations"
 summary: "Validate data at controllers; internal services assume data validity."
-rules:
-  - "Avoid repeating validations in internal services"
-  - "Provide clear errors with 4xx HTTP status codes"
-code_refs:  # Optional
-  - "handlers/user.go"
-  - "pkg/validation/*.go"
+---
+
+# Rules
+- Avoid repeating validations in internal services
+- Provide clear errors with 4xx HTTP status codes
+
+# Code Refs
+- "handlers/user.go"
+- "pkg/validation/*.go"
 ```
 
 ### Field Descriptions
 
-- **ts4**: Version of the TS4 format (currently "1.0")
-- **id**: Unique identifier in kebab-case format (lowercase words separated by hyphens)
-- **title**: Descriptive title of the technical specification
-- **summary**: Brief summary of what this specification covers
-- **rules**: Array of implementation rules or guidelines (strings)
-- **code_refs**: Optional array of file paths or patterns related to this specification
+- **rules**: Version of the Rules format (currently "1.0") — in frontmatter
+- **id**: Unique identifier in kebab-case format (lowercase words separated by hyphens) — in frontmatter
+- **title**: Descriptive title of the rule specification — in frontmatter
+- **summary**: Brief summary of what this specification covers — in frontmatter
+- **# Rules**: Markdown section with a list of implementation rules or guidelines
+- **# Code Refs**: Optional markdown section with a list of file paths or patterns related to this specification
 
 ### Key Principles
 
-1. **TS4 does not describe what to build. It defines how to build it correctly.**
-2. TS4 files act as a **technical contract** for implementation
-3. Each TS4 file should focus on a specific technical decision or set of related rules
+1. **Rules do not describe what to build. They define how to build it correctly.**
+2. Rules files act as a **technical contract** for implementation
+3. Each file should focus on a specific technical decision or set of related rules
 4. The `id` field should be descriptive and use kebab-case (e.g., "system-input-validation")
 
 ### Benefits
 
-- **Live Context for AI**: Embedding-friendly, ideal for RAG and LangChain
+- **Live Context for AI**: Embedding-friendly, ideal for RAG and semantic search
 - **Technical Traceability**: Clear and accessible rules without noise
 - **Versionable and Incremental**: Designed for Git and continuous evolution
 - **AI-Ready, Dev-Friendly**: Uses YAML without unnecessary complexity
 
 ### Usage
 
-- TS4 files are located in `docs/ts4/` directory
-- They are indexed in the context store collection `tech-specs`
-- AI assistants should query `tech-specs` collection before implementation to understand technical constraints
-- TS4 files complement ADRs: ADRs explain *why*, TS4 files define *how*
+- Rules files are located in `docs/rules/` directory
+- They are indexed in the context store collection `rules` (the project's technical rules collection)
+- AI assistants should query `rules` collection before implementation to understand technical constraints
+- Rules files complement ADRs: ADRs explain *why*, Rules files define *how*
 
 ## Consequences
 
@@ -254,11 +258,11 @@ code_refs:  # Optional
 
 ### Notes
 - This ADR should be indexed in the context store collection `business-and-architecture`
-- When creating new TS4 files, follow the structure and naming conventions described here
+- When creating new `.md` rules files, follow the structure and naming conventions described here
 """
     
     adr_path.write_text(adr_content, encoding="utf-8")
-    console.print(f"  [green]✓[/green] Created docs/adrs/001-ts4-format.md")
+    console.print(f"  [green]✓[/green] Created docs/adrs/001-rules-format.md")
 
 
 def create_ui_intent_format_adr(target_dir: Path) -> None:
@@ -439,7 +443,7 @@ Accepted
 
 ## Context
 
-This project uses Cliplin and can depend on **knowledge packages**: external repositories that contain ADRs, TS4, business docs, features, rules, or skills. Those packages are installed under the project and indexed in the same context store as project specs, so the AI can use them as context.
+This project uses Cliplin and can depend on **knowledge packages**: external repositories that contain ADRs, rules, business docs, features, rules, or skills. Those packages are installed under the project and indexed in the same context store as project specs, so the AI can use them as context.
 
 ## Decision
 
@@ -460,7 +464,7 @@ This project uses Cliplin and can depend on **knowledge packages**: external rep
 
 ### Context store and visibility
 
-- Documents under `.cliplin/knowledge/**` are indexed in the same collections as project docs (e.g. adrs → business-and-architecture, ts4 → tech-specs). The AI loads them via the Cliplin MCP (context store) when querying context.
+- Documents under `.cliplin/knowledge/**` are indexed in the same collections as project docs (e.g. adrs → business-and-architecture, rules → rules collection). The AI loads them via the Cliplin MCP (context store) when querying context.
 - After add/update, the package is reindexed automatically; after remove, its documents are removed from the store.
 
 ### Full usage and conventions
@@ -572,7 +576,7 @@ alwaysApply: true
 2. **Query relevant collections**: Use Cliplin MCP tools (e.g. context_query_documents) to query and load relevant context from the appropriate collections:
    - 'business-and-architecture' collection: ADRs and business documentation md files located at 'docs/adrs' and 'docs/business' folder
    - 'features' collection: .feature files located at 'docs/features' folder
-   - 'tech-specs' collection: .ts4 files located at 'docs/ts4' folder
+   - 'rules' collection: .md files (the project's technical rules) located at 'docs/rules' folder
    - 'uisi' collection: .yaml files located at 'docs/ui-intent' folder
 3. **Never proceed without context**: Do NOT start any task until you have queried and loaded the relevant context from the context store collections (via Cliplin MCP)
 4. **Use semantic queries**: Query collections using semantic search based on the task domain, entities, and requirements to retrieve the most relevant context
@@ -583,16 +587,16 @@ alwaysApply: true
 
 The following file types should be indexed into their respective collections (see confirmation rules below):
 - `.md` files in `docs/adrs/` → `business-and-architecture` collection
-- `.ts4` files in `docs/ts4/` → `tech-specs` collection
+- `.md` files in `docs/rules/` → `rules` collection (technical rules of the project)
 - `.md` files in `docs/business/` → `business-and-architecture` collection
 - `.feature` files in `docs/features/` → `features` collection
 - `.yaml` files in `docs/ui-intent/` → `uisi` collection
 
 ### Metadata Requirements
 
-- When indexing documents, always include proper metadata as an array of objects with the following structure: `[{'file_path': 'relative/path/to/file', 'type': 'ts4|adr|project-doc|feature|ui-intent', 'collection': 'target-collection-name'}]`
+- When indexing documents, always include proper metadata as an array of objects with the following structure: `[{'file_path': 'relative/path/to/file', 'type': 'rules|adr|project-doc|feature|ui-intent', 'collection': 'target-collection-name'}]`
 - Each document in the documents array must have a corresponding metadata object in the metadatas array at the same index
-- Use the file path (relative to project root) as the document ID when indexing (e.g., 'docs/ts4/ts4-project-structure.ts4')
+- Use the file path (relative to project root) as the document ID when indexing (e.g., 'docs/rules/system-modules.md')
 - Before indexing a document, check if it already exists by querying the collection with the file path as ID using `context_get_documents` or `context_query_documents`. If it exists, use `context_update_documents` to update it instead of adding a duplicate
 
 ### Automatic Detection and User Confirmation
@@ -600,7 +604,7 @@ The following file types should be indexed into their respective collections (se
 When any context file is created or modified, you MUST:
 
 1. **Detect the change**: Identify when files are created or modified in the following directories:
-   - `.ts4` files in `docs/ts4/` → target collection: `tech-specs`
+   - `.md` files in `docs/rules/` → target collection: `rules`
    - `.md` files in `docs/adrs/` → target collection: `business-and-architecture`
    - `.md` files in `docs/business/` → target collection: `business-and-architecture`
    - `.feature` files in `docs/features/` → target collection: `features`
@@ -618,7 +622,7 @@ When any context file is created or modified, you MUST:
      * Check if the document already exists by querying the collection with the file path as ID using `context_get_documents` or `context_query_documents`
      * If it exists, use `context_update_documents` to update it
      * If it doesn't exist, use `context_add_documents` to add it
-     * Always include proper metadata as an array of objects with the structure: `[{'file_path': 'relative/path/to/file', 'type': 'ts4|adr|project-doc|feature|ui-intent', 'collection': 'target-collection-name'}]`
+     * Always include proper metadata as an array of objects with the structure: `[{'file_path': 'relative/path/to/file', 'type': 'rules|adr|project-doc|feature|ui-intent', 'collection': 'target-collection-name'}]`
      * Use the file path (relative to project root) as the document ID
      * Avoid duplicated files and outdated or deleted files in the collection
 
@@ -626,8 +630,7 @@ When any context file is created or modified, you MUST:
    - **Use the Cliplin CLI command**: Run `cliplin reindex` with appropriate options instead of manually using Cliplin MCP tools
    - For specific files: `cliplin reindex docs/path/to/file.md`
    - For directories: `cliplin reindex --directory docs/business`
-   - For file types: `cliplin reindex --type ts4`
-   - For preview: `cliplin reindex --dry-run`
+   - For file types: `cliplin reindex --type rules`   - For preview: `cliplin reindex --dry-run`
    - For verbose output: `cliplin reindex --verbose`
    - The CLI command handles all the complexity of checking for existing documents, updating metadata, and managing collections
    - Only use Cliplin MCP tools directly if the CLI is not available or for specific advanced operations
@@ -654,7 +657,7 @@ alwaysApply: true
 
 ### 1. Consider the feature spec first
 
-- **Before** modifying code, TS4, ADRs, or any other file, ask: does this change or request require an update to a feature spec?
+- **Before** modifying code, rules, ADRs, or any other file, ask: does this change or request require an update to a feature spec?
 - If **yes** or **unclear**: **suggest** updating (or creating) the relevant `.feature` file in `docs/features/` first. Propose the spec changes and get user agreement if needed; then update the feature file **before** touching any other file.
 - If **no** (e.g. pure refactor that does not change behavior, or task explicitly outside feature scope): you may proceed without changing a feature file, but any new or changed behavior must still be traceable to a spec.
 
@@ -689,7 +692,7 @@ When a user asks to implement a feature or work with `.feature` files:
    - **CRITICAL**: Before starting ANY feature analysis or implementation, you MUST load context from the Cliplin MCP server 'cliplin-context'
    - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. context_query_documents) to load relevant context from ALL collections:
      * Query `business-and-architecture` collection to load ADRs and business documentation
-     * Query `tech-specs` collection to load technical specifications and implementation rules
+     * Query `rules` collection to load technical specifications and implementation rules (the project's technical rules)
      * Query `features` collection to load related or dependent features
      * Query `uisi` collection to load UI/UX requirements if applicable
    - **Query strategy**: Use semantic queries based on the feature domain, entities, and use cases to retrieve relevant context
@@ -719,7 +722,7 @@ When a user asks to implement a feature or work with `.feature` files:
    - Identify domain entities, use cases, and boundaries
    - **Use loaded context**: Apply the context loaded from the context store (via Cliplin MCP) in phase 0 to inform your analysis:
      * Use business rules from `business-and-architecture` collection
-     * Apply technical constraints from `tech-specs` collection
+     * Apply technical constraints from `rules` collection
      * Consider dependencies from related features in `features` collection
      * Incorporate UI/UX requirements from `uisi` collection if applicable
 
@@ -729,7 +732,7 @@ When a user asks to implement a feature or work with `.feature` files:
    **a) Architecture Analysis**:
    - **Use loaded context**: Apply the context already loaded from the context store (via Cliplin MCP) in phase 0
    - Use ADRs from `business-and-architecture` collection to understand existing architecture decisions
-   - Apply technical constraints and patterns from `tech-specs` collection
+   - Apply technical constraints and patterns from `rules` collection
    - Identify which domain layer components are needed (entities, value objects, use cases)
    - Determine required ports (interfaces) following hexagonal architecture
    - Identify adapters needed (repositories, external services, etc.)
@@ -749,8 +752,7 @@ When a user asks to implement a feature or work with `.feature` files:
    - Use test fixtures and setup utilities as appropriate for the language/framework
    - Mock all external dependencies to isolate unit tests
    - Test edge cases, validation rules, and error conditions
-   - Aim for minimum 80% code coverage for business logicif is not another coverage rule present on ts4 documents
-   
+   - Aim for minimum 80% code coverage for business logicif is not another coverage rule present on rules documents   
    **d) BDD Test Strategy**:
    - Map each active scenario (non-deprecated) from the `.feature` file to BDD test steps
    - Implement step definitions that exercise the full feature flow
@@ -793,7 +795,7 @@ When a user asks to implement a feature or work with `.feature` files:
      * Ensure the feature file is properly formatted and readable
      * All code and tests must be traceable back to the specific scenarios
      * **Reindex the updated feature file**: Run `cliplin reindex docs/features/feature-name.feature` to update the context store
-     * If you created or modified any context files (ADRs, TS4, business docs), reindex them as well
+     * If you created or modified any context files (ADRs, rules, business docs), reindex them as well
      * This ensures the context remains synchronized with the implementation
 
 ### When User Requests Feature Modification
@@ -805,7 +807,7 @@ When a user asks to modify an existing feature:
    - **Use MCP tools to query collections**: Use the Cliplin MCP tools (e.g. context_query_documents) to load relevant context:
      * Query `features` collection to load the feature being modified and related features that might be affected
      * Query `business-and-architecture` collection to load business rules and ADRs that might impact the change
-     * Query `tech-specs` collection to load technical constraints that must be considered
+     * Query `rules` collection to load technical constraints that must be considered
      * Query `uisi` collection if UI/UX changes are involved
    - **Query strategy**: Use semantic queries based on the feature domain, entities, and use cases to retrieve relevant context
    - **Never proceed without loading context**: Do NOT start modification analysis until you have queried and loaded the relevant context from the context store (via Cliplin MCP)
@@ -937,7 +939,7 @@ alwaysApply: true
 2. **Determine Relevant Collections**: Based on the task domain, entities, and requirements, identify which collections contain relevant context:
    - `business-and-architecture`: ADRs, business documentation, architectural decisions
    - `features`: Feature files, scenarios, business requirements
-   - `tech-specs`: Technical specifications, implementation rules, coding conventions
+   - `rules`: Technical specifications, implementation rules (the project's technical rules), coding conventions
    - `uisi`: UI Intent specifications, user experience requirements
 
 3. **Use Semantic Queries**: Query collections using semantic search based on:
@@ -950,7 +952,7 @@ alwaysApply: true
 
 4. **Query Multiple Collections**: For comprehensive context, query ALL relevant collections:
    - Start with `business-and-architecture` for business rules and ADRs
-   - Query `tech-specs` for technical constraints and implementation patterns
+   - Query `rules` for technical constraints and implementation patterns
    - Query `features` for related features and dependencies
    - Query `uisi` if UI/UX work is involved
 
@@ -963,7 +965,7 @@ alwaysApply: true
 
 **Example 1: Debugging (User says "fix the authentication error")**
 ```
-1. Query 'tech-specs' collection: "authentication error handling"
+1. Query 'rules' collection: "authentication error handling"
 2. Query 'features' collection: "authentication login scenarios"
 3. Query 'business-and-architecture' collection: "authentication security ADRs"
 4. Review loaded context to understand expected behavior and error patterns
@@ -974,13 +976,13 @@ alwaysApply: true
 ```
 1. Query 'features' collection: "payment processing scenarios"
 2. Query 'business-and-architecture' collection: "payment business rules"
-3. Query 'tech-specs' collection: "payment implementation patterns"
+3. Query 'rules' collection: "payment implementation patterns"
 4. Review loaded context before starting implementation
 ```
 
 **Example 3: Fixing (User says "fix the bug in component X")**
 ```
-1. Query 'tech-specs' collection: "[component-name] implementation rules"
+1. Query 'rules' collection: "[component-name] implementation rules"
 2. Query 'features' collection: "[feature-name] scenarios"
 3. Query 'business-and-architecture' collection: "related ADRs"
 4. Review loaded context to understand expected behavior
@@ -990,7 +992,7 @@ alwaysApply: true
 **Example 4: Architecture (User says "improve the system architecture")**
 ```
 1. Query 'business-and-architecture' collection: "existing architecture ADRs"
-2. Query 'tech-specs' collection: "architectural patterns and constraints"
+2. Query 'rules' collection: "architectural patterns and constraints"
 3. Query 'features' collection: "system features and dependencies"
 4. Review loaded context to understand current architecture
 5. THEN propose improvements
@@ -1148,7 +1150,7 @@ Reference files under `.claude/rules/` as needed:
 
 The `.mcp.json` file at the project root configures the Cliplin context MCP server. This allows Claude to:
 - Query project context from the context store collections (via Cliplin MCP)
-- Access ADRs, features, TS4 specs, and UI Intent files
+- Access ADRs, features, rules, and UI Intent files
 - Load relevant context before starting any task
 
 Make sure the MCP server is properly configured in Claude Desktop's settings to use the project's `.mcp.json`.
