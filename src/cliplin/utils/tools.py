@@ -85,3 +85,21 @@ def get_cliplin_tools_config_path() -> Optional[Path]:
     
     return None
 
+
+def is_tool_enabled(tool_name: str) -> bool:
+    """
+    Return True if the given tool is configured in Cliplin's tools.yaml.
+    Used to gate optional features (e.g. ui-intent ADR) on tool availability.
+    """
+    config_path = get_cliplin_tools_config_path()
+    if not config_path:
+        return False
+    try:
+        import yaml
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f)
+        tools = config.get("tools", {}) if isinstance(config, dict) else {}
+        return tool_name in tools
+    except Exception:
+        return False
+

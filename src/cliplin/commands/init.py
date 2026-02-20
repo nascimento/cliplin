@@ -21,6 +21,7 @@ from cliplin.utils.templates import (
     create_rules_format_adr,
     create_ui_intent_format_adr,
 )
+from cliplin.utils.tools import is_tool_enabled
 
 console = Console()
 
@@ -78,7 +79,8 @@ def init_command(
         console.print("\n[bold]Creating framework context documentation...[/bold]")
         create_framework_adr(project_root)
         create_rules_format_adr(project_root)
-        create_ui_intent_format_adr(project_root)
+        if is_tool_enabled("ui-intent"):
+            create_ui_intent_format_adr(project_root)
         create_knowledge_packages_adr(project_root)
         
         # Create AI tool configuration if specified

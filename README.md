@@ -54,7 +54,7 @@ Cliplin organizes specifications into four complementary pillars, each with a pr
 - Focus on **intent**, not pixels
 - Allow AI to generate UI code without guessing UX decisions
 
-#### 3. ⚙️ Rules - Project Rules (.rules)
+#### 3. ⚙️ Rules - Project Rules (.md)
 **Defines HOW software must be implemented**
 
 - Act as a **technical contract**
@@ -90,8 +90,8 @@ Cliplin automatically creates the directory structure and configures everything 
 │   ├── adrs/          # Architecture Decision Records (incl. 005-knowledge-packages.md)
 │   ├── business/      # Business documentation
 │   ├── features/      # Feature files (Gherkin)
-│   ├── rules/         # Project rules (.rules)
-│   └── ui-intent/     # UI specifications
+│   ├── rules/         # Project rules (.md)
+│   └── ui-intent/     # UI specifications (when ui-intent tool is enabled)
 └── .cliplin/
     └── data/context/  # Context store (project context store)
 ```
@@ -116,18 +116,22 @@ Feature: User Authentication
     And I should be redirected to the dashboard
 ```
 
-**Rules File** (`docs/rules/input-validation.rules`):
-```yaml
+**Rules File** (`docs/rules/input-validation.md`):
+```markdown
+---
 rules: "1.0"
 id: "input-validation"
 title: "Input Validation"
 summary: "Validate data at controllers; internal services assume validity"
-rules:
-  - "Avoid repeating validations in internal services"
-  - "Provide clear errors with 4xx HTTP status codes"
-code_refs:
-  - "handlers/user.py"
-  - "validators/*.py"
+---
+
+# Rules
+- Avoid repeating validations in internal services
+- Provide clear errors with 4xx HTTP status codes
+
+# Code Refs
+- "handlers/user.py"
+- "validators/*.py"
 ```
 
 ### 3. Index Context
@@ -137,7 +141,7 @@ code_refs:
 cliplin reindex
 
 # Index a specific type
-clipin reindex --type rules
+clilin reindex --type rules
 
 # Preview changes
 cliplin reindex --dry-run
